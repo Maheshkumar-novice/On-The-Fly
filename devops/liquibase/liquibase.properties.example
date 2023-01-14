@@ -1,0 +1,8 @@
+changeLogFile: changelog.xml
+url:  jdbc:postgresql://<host>/<db>?currentSchema=public
+username:  postgres
+password: postgres
+classpath:  <path-to>/postgresql-42.5.1.jar
+driver: org.postgresql.Driver
+liquibaseSchemaName=public
+liquibase.hub.mode=off

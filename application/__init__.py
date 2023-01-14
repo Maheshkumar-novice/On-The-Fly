@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask import render_template
 
 from config import APP_SETTINGS
 
@@ -11,5 +12,9 @@ def create_app():
     app.config.from_object(APP_SETTINGS)
 
     db.init_app(app)
+
+    @app.route('/')
+    def home():
+        return render_template('home.html', title='On The Fly')
 
     return app
