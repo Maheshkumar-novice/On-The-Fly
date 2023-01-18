@@ -1,0 +1,68 @@
+{% extends "base.html" %} {% block content %}
+<h1>On The Fly</h1>
+<button>
+  <a href="{{ url_for('home') }}">Home</a>
+</button>
+
+<h2>Business Signup</h2>
+<form action="#">
+  <fieldset>
+    <legend>Form</legend>
+    <div>
+      <label for="name">Name</label>
+      <input
+        type="text"
+        name="name"
+        id="name"
+        placeholder="Fruit Shop"
+        required
+      />
+    </div>
+    <div>
+      <label for="email">Email</label>
+      <input
+        type="email"
+        name="email"
+        id="email"
+        placeholder="abc@xyz.com"
+        required
+      />
+    </div>
+    <div>
+      <label for="phone-number">Phone Number</label>
+      <input
+        type="tel"
+        name="phone-number"
+        id="phone-number"
+        placeholder="9876543210"
+        pattern="^\d{10}$"
+      />
+    </div>
+    <div>
+      <label for="password">Password</label>
+      <input
+        type="password"
+        name="password"
+        id="password"
+        placeholder="Strong@123"
+        pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}"
+        required
+      />
+    </div>
+    <div>
+      <label for="confirm-password">Confirm Password</label>
+      <input
+        type="password"
+        name="confirm-password"
+        id="confirm-password"
+        placeholder="Strong@123"
+        pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}"
+        required
+      />
+    </div>
+    <div>
+      <button type="submit" class="submit-btn">Create Account</button>
+    </div>
+  </fieldset>
+</form>
+{% endblock content %}

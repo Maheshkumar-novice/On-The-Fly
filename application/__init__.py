@@ -1,6 +1,5 @@
-from flask import Flask
+from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
-from flask import render_template
 
 from config import APP_SETTINGS
 
@@ -16,5 +15,8 @@ def create_app():
     @app.route('/')
     def home():
         return render_template('home.html', title='On The Fly')
+
+    from application.auth.routes import auth_blueprint
+    app.register_blueprint(auth_blueprint, url_prefix='/auth')
 
     return app
