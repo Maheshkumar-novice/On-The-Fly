@@ -6,148 +6,41 @@
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
                         http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd
                         http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
-    <changeSet author="Maheshkumar" id="14-01-2023--1">
+    <changeSet id="1" author="Maheshkumar">
         <sql>
-            CREATE TABLE public."users" (
-                "id" uuid PRIMARY KEY,
-                "name" varchar(75),
-                "email" varchar(100) UNIQUE,
-                "mobile_no" varchar(20) UNIQUE,
-                "password_hash" varchar(150),
-                "is_email_verified" boolean DEFAULT false,
-                "is_mobile_verified" boolean DEFAULT false,
-                "is_totp_enabled" boolean DEFAULT false,
-                "is_active" boolean,
-                "is_deleted" boolean,
-                "created_at" timestamp DEFAULT NOW(),
-                "updated_at" timestamp DEFAULT NOW()
+            CREATE TYPE public.USER_ROLES AS ENUM ('BUSINESS', 'CUSTOMER');
+        </sql>
+        <sql>
+            CREATE TABLE public.roles (
+                id bigserial NOT NULL,
+                role_name public.USER_ROLES NOT NULL,
+                created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                CONSTRAINT pk_roles PRIMARY KEY (id),
+                CONSTRAINT roles_role_name_unqiue UNIQUE (role_name)
             );
         </sql>
-    </changeSet>
-    <changeSet author="Maheshkumar" id="14-01-2023--2">
         <sql>
-            CREATE TABLE public."roles" (
-                "id" uuid PRIMARY KEY,
-                "role_name" varchar(20)
-              );
+            INSERT INTO public.roles (role_name)
+            VALUES ('BUSINESS'), ('CUSTOMER');
         </sql>
     </changeSet>
-    <changeSet author="Maheshkumar" id="14-01-2023--3">
+    <changeSet id="2" author="Maheshkumar">
         <sql>
-            CREATE TABLE public."user_role_mapping" (
-                "id" uuid PRIMARY KEY,
-                "user_id" uuid REFERENCES users(id) UNIQUE,
-                "role_id" uuid REFERENCES roles(id)
-              );
-        </sql>
-    </changeSet>
-    <changeSet author="Maheshkumar" id="14-01-2023--4">
-        <sql>
-            CREATE TABLE public."token_types" (
-                "id" uuid PRIMARY KEY,
-                "name" varchar(20)
-              );
-        </sql>
-    </changeSet>
-    <changeSet author="Maheshkumar" id="14-01-2023--5">
-        <sql>
-            CREATE TABLE public."tokens" (
-                "id" uuid PRIMARY KEY,
-                "user_id" uuid REFERENCES users(id),
-                "type_id" uuid REFERENCES token_types(id),
-                "token" varchar(150),
-                "created_at" timestamp DEFAULT NOW(),
-                "updated_at" timestamp DEFAULT NOW()
-              );
-            CREATE INDEX "idx_tokens_user_id" ON tokens ("user_id");
-        </sql>
-    </changeSet>
-    <changeSet author="Maheshkumar" id="14-01-2023--6">
-        <sql> 
-            CREATE TABLE public."totp_values" (
-                "id" uuid PRIMARY KEY,
-                "user_id" uuid REFERENCES users(id) UNIQUE,
-                "totp_key_hash" varchar(150),
-                "totp_key_secret" varchar(50),
-                "totp_key_algorithm" varchar(50),
-                "totp_key_issuer" varchar(50),
-                "totp_key_period" integer,
-                "created_at" timestamp DEFAULT NOW(),
-                "updated_at" timestamp DEFAULT NOW()
-              );
-        </sql>
-    </changeSet>
-    <changeSet author="Maheshkumar" id="14-01-2023--7">
-        <sql>
-            CREATE TABLE public."addresses" (
-                "id" uuid PRIMARY KEY,
-                "user_id" uuid REFERENCES users(id),
-                "address" varchar(300),
-                "country" varchar(30),
-                "state" varchar(50),
-                "district" varchar(50),
-                "pincode" integer,
-                "created_at" timestamp DEFAULT NOW(),
-                "updated_at" timestamp DEFAULT NOW()
-              );
-        </sql>
-    </changeSet>
-    <changeSet author="Maheshkumar" id="14-01-2023--8">
-        <sql>
-            CREATE TABLE public."business_types" (
-                "id" uuid PRIMARY KEY,
-                "name" varchar(30),
-                "created_at" timestamp DEFAULT NOW(),
-                "updated_at" timestamp DEFAULT NOW()
-              );
-        </sql>
-    </changeSet>
-    <changeSet author="Maheshkumar" id="14-01-2023--9">
-        <sql>
-            CREATE TABLE public."business_subtypes" (
-                "id" uuid PRIMARY KEY,
-                "business_type_id" uuid REFERENCES business_types(id),
-                "name" varchar(30),
-                "created_at" timestamp DEFAULT NOW(),
-                "updated_at" timestamp DEFAULT NOW()
-              );              
-        </sql>
-    </changeSet>
-    <changeSet author="Maheshkumar" id="14-01-2023--10">
-        <sql>
-            CREATE TABLE public."business_type_mapping" (
-                "id" uuid PRIMARY KEY,
-                "user_id" uuid REFERENCES users(id) UNIQUE,
-                "type_id" uuid REFERENCES business_types(id),
-                "sub_type_id" uuid REFERENCES business_subtypes(id),
-                "created_at" timestamp DEFAULT NOW(),
-                "updated_at" timestamp DEFAULT NOW()
-              );              
-        </sql>
-    </changeSet>
-    <changeSet author="Maheshkumar" id="14-01-2023--11">
-        <sql>
-            CREATE TABLE public."business_details" (
-                "id" uuid PRIMARY KEY,
-                "user_id" uuid REFERENCES users(id) UNIQUE,
-                "description" varchar(400),
-                "gst_no" varchar(100),
-                "is_verified" boolean DEFAULT false,
-                "created_at" timestamp DEFAULT NOW(),
-                "updated_at" timestamp DEFAULT NOW()
-              );
-        </sql>
-    </changeSet>
-    <changeSet author="Maheshkumar" id="14-01-2023--12">
-        <sql>
-            CREATE TABLE public."customer_preferences" (
-                "id" uuid PRIMARY KEY,
-                "user_id" uuid REFERENCES users(id),
-                "business_type_id" uuid REFERENCES business_types(id),
-                "business_subtype_id" uuid REFERENCES business_subtypes(id),
-                "created_at" timestamp DEFAULT NOW(),
-                "updated_at" timestamp DEFAULT NOW()
-              );
+            CREATE TABLE public.users (
+                id bigserial NOT NULL,
+                role_id bigint NOT NULL,
+                name varchar(75) NOT NULL,
+                email varchar(100) NOT NULL,
+                mobile_no varchar(20) NOT NULL,
+                password_hash varchar(250) NOT NULL,
+                created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                CONSTRAINT pk_users PRIMARY KEY (id),
+                CONSTRAINT fk_users_role_id FOREIGN KEY (role_id) REFERENCES public.roles(id),
+                CONSTRAINT users_email_unique UNIQUE (email),
+                CONSTRAINT users_mobile_no_unique UNIQUE (mobile_no)
+            );
         </sql>
     </changeSet>
 </databaseChangeLog>
