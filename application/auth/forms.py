@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import PasswordField, StringField, TelField, EmailField
+from wtforms import EmailField, PasswordField, StringField, TelField
 from wtforms.validators import (DataRequired, Email, EqualTo, Length, Regexp,
                                 ValidationError)
 
@@ -26,3 +26,10 @@ class UserRegistrationForm(FlaskForm):
         user = User.query.filter_by(mobile_no=mobile_no.data).first()
         if user is not None:
             raise ValidationError('Please use a different mobile number.')
+
+
+class UserLoginForm(FlaskForm):
+    email = EmailField('Email', validators=[
+        DataRequired(), Email()], description='Email')
+    password = PasswordField('Password', validators=[
+                             DataRequired(), Length(min=6, max=50), Regexp(regex='(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,50}')], description='Password')
