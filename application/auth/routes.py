@@ -45,3 +45,8 @@ auth_blueprint.add_url_rule(rule='/customers/login',
                             view_func=login_customer_user,
                             endpoint='login_customer_user',
                             methods=['POST'])
+
+auth_blueprint.add_url_rule(rule='/logout',
+                            view_func=logout,
+                            endpoint='logout',
+                            methods=['GET'])

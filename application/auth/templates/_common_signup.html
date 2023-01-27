@@ -1,0 +1,25 @@
+{% if account_type == 'business' %}
+    {% set action_url = url_for('auth.create_business_user') %}
+    {% set legend = 'Business Signup' %}
+    {% set login_url = url_for('auth.get_business_login_page') %}
+{% else %}
+    {% set action_url = url_for('auth.create_customer_user') %}
+    {% set legend = 'Customer Signup' %}
+    {% set login_url = url_for('auth.get_customer_login_page') %}
+{% endif %}
+
+<div class="container">
+    <div class="columns">
+      <div class="column is-half is-offset-one-quarter">
+        <form action={{action_url}} method="POST" class="box">
+            <fieldset>
+                <legend class="title is-4">{{legend}}</legend>
+                {% include "_common_signup_form_fields.html" %}
+            </fieldset>
+        </form>
+      </div>
+    </div>
+    <div class="container has-text-centered">
+        <p>Existing account? <a href={{login_url}}>Login</a></p>
+    </div>
+  </div>

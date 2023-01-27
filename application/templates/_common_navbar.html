@@ -1,0 +1,19 @@
+<header class="navbar">
+  <div class="navbar-brand">
+    <a class="title navbar-item" href="{{url_for('home')}}">On The Fly</a>
+  </div>
+  <div class="navbar-end">
+    {% if navbar_type == 'home' %} 
+        <div class="navbar-item">
+            <a class="button is-link" href="{{url_for('auth.get_business_signup_page')}}">Business</a>
+        </div>
+        <div class="navbar-item">
+            <a class="button is-link" href="{{url_for('auth.get_customer_signup_page')}}">Customer</a>
+        </div>
+    {% else %} 
+        <div class="navbar-item">
+            <a class="button is-link" href="{{url_for('home')}}">Home</a>
+        </div>
+    {% endif %}
+  </div>
+</header>

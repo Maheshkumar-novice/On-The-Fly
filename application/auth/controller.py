@@ -1,4 +1,5 @@
-from flask import redirect, render_template, url_for
+from flask import flash, redirect, render_template, url_for
+from flask_login import login_user, logout_user
 
 from application import db
 from application.auth.constants import BUSINESS_ROLE, CUSTOMER_ROLE
@@ -7,7 +8,7 @@ from application.auth.models import Role, User
 
 
 def get_business_signup_page():
-    return render_template('business_signup.html', form=UserRegistrationForm())
+    return render_template('business_signup.html', form=UserRegistrationForm(), account_type='business')
 
 
 def create_business_user():
@@ -24,11 +25,11 @@ def create_business_user():
         db.session.add(user)
         db.session.commit()
         return redirect(url_for('home'))
-    return render_template('business_signup.html', form=form)
+    return render_template('business_signup.html', form=form, account_type='business')
 
 
 def get_customer_signup_page():
-    return render_template('customer_signup.html', form=UserRegistrationForm())
+    return render_template('customer_signup.html', form=UserRegistrationForm(), account_type='customer')
 
 
 def create_customer_user():
@@ -45,36 +46,45 @@ def create_customer_user():
         db.session.add(user)
         db.session.commit()
         return redirect(url_for('home'))
-    return render_template('customer_signup.html', form=form)
+    return render_template('customer_signup.html', form=form, account_type='customer')
 
 
 def get_business_login_page():
-    return render_template('business_login.html', form=UserLoginForm())
+    return render_template('business_login.html', form=UserLoginForm(), account_type='business')
 
 
 def login_business_user():
     form = UserLoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).scalar()
+        role_id = Role.query.filter_by(role_name=BUSINESS_ROLE).first().id
 
-        if user is None or (not user.check_password(form.password.data)):
-            pass  # flash error in login page
-
+        if user is None or (not user.check_password(form.password.data)) or user.role_id != role_id:
+            flash('Please check the credentials and try again.')
+            return redirect(url_for('auth.login_business_user'))
+        login_user(user)
         return redirect(url_for('home'))
-    return render_template('business_login.html', form=form)
+    return render_template('business_login.html', form=form, account_type='business')
 
 
 def get_customer_login_page():
-    return render_template('customer_login.html', form=UserLoginForm())
+    return render_template('customer_login.html', form=UserLoginForm(), account_type='customer')
 
 
 def login_customer_user():
     form = UserLoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).scalar()
+        role_id = Role.query.filter_by(role_name=CUSTOMER_ROLE).first().id
 
-        if user is None or (not user.check_password(form.password.data)):
-            pass  # flash error in login page
-
+        if user is None or (not user.check_password(form.password.data)) or user.role_id != role_id:
+            flash('Please check the credentials and try again.')
+            return redirect(url_for('auth.login_customer_user'))
+        login_user(user)
         return redirect(url_for('home'))
-    return render_template('customer_login.html', form=form)
+    return render_template('customer_login.html', form=form, account_type='customer')
+
+
+def logout():
+    logout_user()
+    return redirect(url_for('home'))
