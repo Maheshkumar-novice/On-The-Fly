@@ -17,6 +17,9 @@ class Config():
     SECRET_KEY = os.getenv('SECRET_KEY', os.urandom(32))
     SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID', '')
+    TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN', '')
+    TWILIO_VERIFY_SERVICE = os.getenv('TWILIO_VERIFY_SERVICE', '')
 
 
 class DevelopmentConfig(Config):

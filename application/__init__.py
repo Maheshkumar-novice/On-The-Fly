@@ -2,11 +2,13 @@ from flask import Flask, render_template
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 
-from config import APP_SETTINGS
+from config import APP_SETTINGS, Config
+from twilio.rest import Client
 
 db = SQLAlchemy()
 login_manager = LoginManager()
-
+login_manager.login_view = 'home'
+mail_client = Client(Config.TWILIO_ACCOUNT_SID, Config.TWILIO_AUTH_TOKEN)
 
 def create_app():
     app = Flask(__name__)

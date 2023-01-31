@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from flask_login import UserMixin
-from sqlalchemy import Column, DateTime, Enum, ForeignKey, Integer, String
+from sqlalchemy import Column, DateTime, Enum, ForeignKey, Integer, String, Boolean
 from sqlalchemy.orm import relationship
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -19,6 +19,7 @@ class User(db.Model, UserMixin):
     email = Column(String(100), nullable=False, unique=True)
     mobile_no = Column(String(20), nullable=False, unique=True)
     password_hash = Column(String(150), nullable=False)
+    is_email_verified = Column(Boolean, nullable=False, default=False)
     created_at = Column(DateTime, nullable=False, default=datetime.now)
     updated_at = Column(DateTime, nullable=False,
                         default=datetime.now, onupdate=datetime.now)

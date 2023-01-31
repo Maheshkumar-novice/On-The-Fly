@@ -1,9 +1,10 @@
-from flask import flash, redirect, render_template, url_for
-from flask_login import login_user, logout_user
+from lib.mailer import send_verification
+from flask import flash, redirect, render_template, url_for, session
+from flask_login import current_user, login_user, logout_user, login_required
 
 from application import db
 from application.auth.constants import BUSINESS_ROLE, CUSTOMER_ROLE
-from application.auth.forms import UserLoginForm, UserRegistrationForm
+from application.auth.forms import *
 from application.auth.models import Role, User
 
 
@@ -63,7 +64,7 @@ def login_business_user():
             flash('Please check the credentials and try again.')
             return redirect(url_for('auth.login_business_user'))
         login_user(user)
-        return redirect(url_for('home'))
+        return redirect(url_for('auth.get_security_measures_page'))
     return render_template('business_login.html', form=form, account_type='business')
 
 
@@ -88,3 +89,45 @@ def login_customer_user():
 def logout():
     logout_user()
     return redirect(url_for('home'))
+
+
+@login_required
+def get_security_measures_page():
+    if not current_user.is_email_verified:
+        return redirect(url_for('auth.get_email_verification_page'))
+
+
+@login_required
+def get_email_verification_page():
+    return render_template('email_verification.html', form=EmailVerificationForm())
+
+
+@login_required
+def generate_email_verification_code():
+    form = EmailVerificationForm()
+
+    if form.validate_on_submit():
+        to_email = form.email.data
+        session['to_email'] = to_email
+        send_verification(to_email)
+        return redirect(url_for('auth.get_verification_code_page'))
+    return render_template('email_verification.html', form=form)
+
+
+@login_required
+def get_verification_code_page():
+    return render_template('verification_code.html', form=EmailVerificationCodeForm())
+
+
+@login_required
+def verify_email_verification_code():
+    form = EmailVerificationCodeForm()
+
+    if form.validate_on_submit():
+        email = session['to_email']
+        user = User.query.filter_by(email=email).first()
+        user.is_email_verified = True
+        db.session.add(user)
+        db.session.commit()
+        return redirect(url_for('home'))
+    return render_template('verification_code.html', form=form)

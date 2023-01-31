@@ -1,0 +1,26 @@
+{% extends "base.html" %} 
+
+{% block content %}
+  {% include "_flash.html" %}
+
+  {% include "_common_navbar.html" %}
+  
+  <div class="container">
+    <div class="columns">
+      <div class="column is-half is-offset-one-quarter">
+        <form action="{{url_for('auth.generate_email_verification_code')}}" method="POST" class="box">
+            <fieldset>
+                <legend class="title is-4">Email Verification</legend>
+                {% include "_form_fields.html" %}
+
+                <div class="field">
+                    <div class="control">
+                      <button type="submit" class="button is-link">Verify</button>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+      </div>
+    </div>
+</div>
+{% endblock %}

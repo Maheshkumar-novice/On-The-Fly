@@ -1,3 +1,4 @@
+from lib.mailer import check_verification_token
 from flask_wtf import FlaskForm
 from wtforms import EmailField, PasswordField, StringField, TelField
 from wtforms.validators import (DataRequired, Email, EqualTo, Length, Regexp,
@@ -33,3 +34,27 @@ class UserLoginForm(FlaskForm):
         DataRequired(), Email()], description='Email')
     password = PasswordField('Password', validators=[
                              DataRequired(), Length(min=6, max=50), Regexp(regex='(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,50}')], description='Password')
+
+    def validate_email(self, email):
+        user = User.query.filter_by(email=email.data).first()
+        if user is None:
+            raise ValidationError('User not exist.')
+
+
+class EmailVerificationForm(FlaskForm):
+    email = EmailField('Email', validators=[
+        DataRequired(), Email()], description='Email')
+
+    def validate_email(self, email):
+        user = User.query.filter_by(email=email.data).first()
+        if user is None:
+            raise ValidationError('Email not exist.')
+
+
+class EmailVerificationCodeForm(FlaskForm):
+    code = StringField('Code', validators=[DataRequired(), Length(
+        min=6, max=6), Regexp(regex='^\d{6}$')], description='Verification Code')
+
+    def validate_code(self, code):
+        if not check_verification_token(code.data):
+            raise ValidationError('Incorrect Verification Code.')
