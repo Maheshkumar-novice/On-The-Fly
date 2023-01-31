@@ -5,10 +5,10 @@
   <div class="navbar-end">
     {% if navbar_type == 'home' %} 
         <div class="navbar-item">
-            <a class="button is-link" href="{{url_for('auth.get_business_signup_page')}}">Business</a>
+            <a class="button is-link" href="{{url_for('auth.login', account_type='BUSINESS')}}">Business</a>
         </div>
         <div class="navbar-item">
-            <a class="button is-link" href="{{url_for('auth.logout')}}">Customer</a>
+            <a class="button is-link" href="{{url_for('auth.login', account_type='CUSTOMER')}}">Customer</a>
         </div>
     {% else %} 
         <div class="navbar-item">

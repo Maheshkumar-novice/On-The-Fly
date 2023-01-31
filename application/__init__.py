@@ -1,9 +1,9 @@
 from flask import Flask, render_template
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
+from twilio.rest import Client
 
 from config import APP_SETTINGS, Config
-from twilio.rest import Client
 
 db = SQLAlchemy()
 login_manager = LoginManager()

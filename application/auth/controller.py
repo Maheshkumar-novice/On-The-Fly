@@ -1,133 +1,81 @@
-from lib.mailer import send_verification
-from flask import flash, redirect, render_template, url_for, session
-from flask_login import current_user, login_user, logout_user, login_required
+from flask import flash, redirect, render_template, request, session, url_for
+from flask_login import current_user, login_required, login_user, logout_user
 
 from application import db
 from application.auth.constants import BUSINESS_ROLE, CUSTOMER_ROLE
 from application.auth.forms import *
 from application.auth.models import Role, User
+from lib.mailer import send_verification
 
 
-def get_business_signup_page():
-    return render_template('business_signup.html', form=UserRegistrationForm(), account_type='business')
-
-
-def create_business_user():
+def signup():
     form = UserRegistrationForm()
+    account_type = request.args.get('account_type', '')
+
+    if account_type not in [BUSINESS_ROLE, CUSTOMER_ROLE]:
+        flash('Invalid Account Type.')
+        return redirect(url_for('home'))
+
     if form.validate_on_submit():
         user_data = {
             'name': form.name.data,
             'email': form.email.data,
             'mobile_no': form.mobile_no.data,
-            'role_id': Role.query.filter_by(role_name=BUSINESS_ROLE).first().id
+            'role_id': Role.query.filter_by(role_name=account_type).first().id
         }
         user = User(**user_data)
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-        return redirect(url_for('home'))
-    return render_template('business_signup.html', form=form, account_type='business')
+        return redirect(url_for('auth.login', account_type=account_type))
+    return render_template('signup.html', form=form, account_type=account_type)
 
 
-def get_customer_signup_page():
-    return render_template('customer_signup.html', form=UserRegistrationForm(), account_type='customer')
-
-
-def create_customer_user():
-    form = UserRegistrationForm()
-    if form.validate_on_submit():
-        user_data = {
-            'name': form.name.data,
-            'email': form.email.data,
-            'mobile_no': form.mobile_no.data,
-            'role_id': Role.query.filter_by(role_name=CUSTOMER_ROLE).first().id
-        }
-        user = User(**user_data)
-        user.set_password(form.password.data)
-        db.session.add(user)
-        db.session.commit()
-        return redirect(url_for('home'))
-    return render_template('customer_signup.html', form=form, account_type='customer')
-
-
-def get_business_login_page():
-    return render_template('business_login.html', form=UserLoginForm(), account_type='business')
-
-
-def login_business_user():
+def login():
     form = UserLoginForm()
-    if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).scalar()
-        role_id = Role.query.filter_by(role_name=BUSINESS_ROLE).first().id
+    account_type = request.args.get('account_type', '')
 
-        if user is None or (not user.check_password(form.password.data)) or user.role_id != role_id:
-            flash('Please check the credentials and try again.')
-            return redirect(url_for('auth.login_business_user'))
-        login_user(user)
-        return redirect(url_for('auth.get_security_measures_page'))
-    return render_template('business_login.html', form=form, account_type='business')
-
-
-def get_customer_login_page():
-    return render_template('customer_login.html', form=UserLoginForm(), account_type='customer')
-
-
-def login_customer_user():
-    form = UserLoginForm()
-    if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).scalar()
-        role_id = Role.query.filter_by(role_name=CUSTOMER_ROLE).first().id
-
-        if user is None or (not user.check_password(form.password.data)) or user.role_id != role_id:
-            flash('Please check the credentials and try again.')
-            return redirect(url_for('auth.login_customer_user'))
-        login_user(user)
+    if account_type not in [BUSINESS_ROLE, CUSTOMER_ROLE]:
+        flash('Invalid Account Type.')
         return redirect(url_for('home'))
-    return render_template('customer_login.html', form=form, account_type='customer')
+
+    if form.validate_on_submit():
+        email = form.email.data
+        user = User.query.filter_by(email=email).first()
+        user_validity = user and (user.check_password(form.password.data))
+
+        if not user_validity:
+            flash('Please check the credentials and try again.')
+            return redirect(url_for('auth.login', account_type=account_type))
+
+        login_user(user)
+        session['_email'] = email
+        return redirect(url_for('auth.security_measures'))
+    return render_template('login.html', form=form, account_type=account_type)
 
 
-def logout():
-    logout_user()
+@login_required
+def security_measures():
+    if not current_user.is_email_verified:
+        send_verification(session['_email'])
+        return redirect(url_for('auth.email_verification'))
     return redirect(url_for('home'))
 
 
 @login_required
-def get_security_measures_page():
-    if not current_user.is_email_verified:
-        return redirect(url_for('auth.get_email_verification_page'))
-
-
-@login_required
-def get_email_verification_page():
-    return render_template('email_verification.html', form=EmailVerificationForm())
-
-
-@login_required
-def generate_email_verification_code():
+def email_verification():
     form = EmailVerificationForm()
 
     if form.validate_on_submit():
-        to_email = form.email.data
-        session['to_email'] = to_email
-        send_verification(to_email)
-        return redirect(url_for('auth.get_verification_code_page'))
-    return render_template('email_verification.html', form=form)
-
-
-@login_required
-def get_verification_code_page():
-    return render_template('verification_code.html', form=EmailVerificationCodeForm())
-
-
-@login_required
-def verify_email_verification_code():
-    form = EmailVerificationCodeForm()
-
-    if form.validate_on_submit():
-        email = session['to_email']
-        user = User.query.filter_by(email=email).first()
+        user = User.query.filter_by(email=session['_email']).first()
         user.is_email_verified = True
         db.session.add(user)
         db.session.commit()
         return redirect(url_for('home'))
-    return render_template('verification_code.html', form=form)
+    return render_template('verification.html', form=form, template_type='email_verification')
+
+
+def logout():
+    session.clear()
+    logout_user()
+    return redirect(url_for('home'))

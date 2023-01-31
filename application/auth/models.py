@@ -1,7 +1,8 @@
 from datetime import datetime
 
 from flask_login import UserMixin
-from sqlalchemy import Column, DateTime, Enum, ForeignKey, Integer, String, Boolean
+from sqlalchemy import (Boolean, Column, DateTime, Enum, ForeignKey, Integer,
+                        String)
 from sqlalchemy.orm import relationship
 from werkzeug.security import check_password_hash, generate_password_hash
 

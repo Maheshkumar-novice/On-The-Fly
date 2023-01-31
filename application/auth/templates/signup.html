@@ -1,0 +1,23 @@
+{% if account_type == 'BUSINESS' %}
+    {% set legend = 'Business Signup' %}
+{% else %}
+    {% set legend = 'Customer Signup' %}
+{% endif %}
+
+{% set action_url = url_for('auth.signup', account_type=account_type) %}
+{% set login_url = url_for('auth.login', account_type=account_type) %}
+{% set button_value = 'Create Account' %}
+
+{% extends "base.html" %} 
+{% import "macros.html" as macros %}
+
+{% block content %}
+    {% include "_common_navbar.html" %}
+
+    <div class="container">
+        {{macros.render_generic_form(form, action_url, legend, button_value)}}
+        <div class="container has-text-centered">
+            <p>Existing account? <a href={{login_url}}>Login</a></p>
+        </div>
+    </div>
+{% endblock content %}
