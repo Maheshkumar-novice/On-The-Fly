@@ -1,4 +1,5 @@
 from flask import session
+from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import EmailField, PasswordField, StringField, TelField
 from wtforms.validators import (DataRequired, Email, EqualTo, Length, Regexp,
@@ -47,5 +48,14 @@ class EmailVerificationForm(FlaskForm):
         min=6, max=6), Regexp(regex='^\d{6}$')], description='Verification Code')
 
     def validate_code(self, code):
-        if not check_verification_token(session['_email'], code.data):
+        if not check_verification_token(current_user.email, code.data):
+            raise ValidationError('Incorrect Verification Code.')
+
+
+class MobileVerificationForm(FlaskForm):
+    code = StringField('Code', validators=[DataRequired(), Length(
+        min=6, max=6), Regexp(regex='^\d{6}$')], description='Verification Code')
+
+    def validate_code(self, code):
+        if not check_verification_token(current_user.mobile_no, code.data):
             raise ValidationError('Incorrect Verification Code.')

@@ -26,21 +26,12 @@ auth_blueprint.add_url_rule(rule='/email_verification',
                             endpoint='email_verification',
                             methods=['GET', 'POST'])
 
+auth_blueprint.add_url_rule(rule='/mobile_verification',
+                            view_func=mobile_verification,
+                            endpoint='mobile_verification',
+                            methods=['GET', 'POST'])
+
 auth_blueprint.add_url_rule(rule='/logout',
                             view_func=logout,
                             endpoint='logout',
                             methods=['GET'])
-# auth_blueprint.add_url_rule(rule='/email_verification',
-#                             view_func=generate_email_verification_code,
-#                             endpoint='generate_email_verification_code',
-#                             methods=['POST'])
-
-# auth_blueprint.add_url_rule(rule='/email_verification_code',
-#                             view_func=get_verification_code_page,
-#                             endpoint='get_verification_code_page',
-#                             methods=['GET'])
-
-# auth_blueprint.add_url_rule(rule='/email_verification_code',
-#                             view_func=verify_email_verification_code,
-#                             endpoint='verify_email_verification_code',
-#                             methods=['POST'])

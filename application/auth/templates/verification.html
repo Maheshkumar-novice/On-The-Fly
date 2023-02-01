@@ -1,6 +1,12 @@
-{% set action_url = url_for('auth.email_verification') %}
-{% set button_value = 'Verify Code' %}
-{% set legend = 'Email Verification Code' %}
+{% if template_type == 'email' %}
+  {% set action_url = url_for('auth.email_verification') %}
+  {% set button_value = 'Verify Code' %}
+  {% set legend = 'Email Verification Code' %}
+{% else %}
+  {% set action_url = url_for('auth.mobile_verification') %}
+  {% set button_value = 'Verify Code' %}
+  {% set legend = 'Mobile Verification Code' %}
+{% endif %}
 
 
 {% extends "base.html" %} 

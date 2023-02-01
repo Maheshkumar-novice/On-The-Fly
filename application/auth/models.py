@@ -21,6 +21,7 @@ class User(db.Model, UserMixin):
     mobile_no = Column(String(20), nullable=False, unique=True)
     password_hash = Column(String(150), nullable=False)
     is_email_verified = Column(Boolean, nullable=False, default=False)
+    is_mobile_verified = Column(Boolean, nullable=False, default=False)
     created_at = Column(DateTime, nullable=False, default=datetime.now)
     updated_at = Column(DateTime, nullable=False,
                         default=datetime.now, onupdate=datetime.now)

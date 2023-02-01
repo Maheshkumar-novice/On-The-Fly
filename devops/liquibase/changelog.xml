@@ -49,4 +49,10 @@
             ADD COLUMN is_email_verified boolean NOT NULL DEFAULT false;
         </sql>
     </changeSet>
+    <changeSet id="4" author="Maheshkumar">
+        <sql>
+            ALTER TABLE public.users
+            ADD COLUMN is_mobile_verified boolean NOT NULL DEFAULT false;
+        </sql>
+    </changeSet>
 </databaseChangeLog>
