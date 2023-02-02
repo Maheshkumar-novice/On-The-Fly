@@ -1,7 +1,12 @@
-{% with messages = get_flashed_messages() %}
+{% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
-        {% for message in messages %}
-            <div class="notification is-danger is-light">
+        {% for cateogry, message in messages %}
+            {% if category == 'error' %} 
+                {% set type_modifier = 'is-danger' %} 
+            {% else %} 
+                {% set type_modifier = 'is-info' %} 
+            {% endif %}
+            <div class="notification {{type_modifier}} is-light">
                 <button class="delete"></button>
                 {{message}}
             </div>

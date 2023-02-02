@@ -55,4 +55,40 @@
             ADD COLUMN is_mobile_verified boolean NOT NULL DEFAULT false;
         </sql>
     </changeSet>
+    <changeSet id="5" author="Maheshkumar">
+        <sql>
+            ALTER TABLE public.users
+            ADD COLUMN is_totp_enabled boolean NOT NULL DEFAULT false;
+        </sql>
+    </changeSet>
+    <changeSet id="6" author="Maheshkumar">
+        <sql>
+            ALTER TABLE public.users
+            ADD COLUMN totp_identity varchar(100) NOT NULL DEFAULT '';
+        </sql>
+    </changeSet>
+    <changeSet id="7" author="Maheshkumar">
+        <sql>
+            ALTER TABLE public.users
+            ADD COLUMN totp_secret varchar(200) NOT NULL DEFAULT '';
+        </sql>
+    </changeSet>
+    <changeSet id="8" author="Maheshkumar">
+        <sql>
+            ALTER TABLE public.users
+            DROP COLUMN totp_secret;
+        </sql>
+    </changeSet>
+    <changeSet id="9" author="Maheshkumar">
+        <sql>
+            ALTER TABLE public.users
+            ADD COLUMN totp_secret varchar(200) NOT NULL DEFAULT '';
+        </sql>
+    </changeSet>
+    <changeSet id="10" author="Maheshkumar">
+        <sql>
+            ALTER TABLE public.users
+            DROP COLUMN totp_identity;
+        </sql>
+    </changeSet>
 </databaseChangeLog>

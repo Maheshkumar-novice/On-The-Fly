@@ -1,0 +1,15 @@
+{% extends "base.html" %} 
+
+{% block content %}
+  {% include "_common_navbar.html" %}
+  
+  <div class="container has-text-centered">
+    <img src="{{url_for('auth.totp_qrcode')}}" alt="qrcode">
+  </div>
+  <div class="container has-text-centered">
+    <p class="is-family-monospace">Please use an authenticator application to scan this code and proceed.</p>
+    <p class="is-family-monospace">You can't see this afterwards.</p>
+    <br>
+    <a href="{{url_for('auth.totp_verification')}}" class="button is-link">Continue</a>
+  </div>
+{% endblock %}

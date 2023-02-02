@@ -31,6 +31,21 @@ auth_blueprint.add_url_rule(rule='/mobile_verification',
                             endpoint='mobile_verification',
                             methods=['GET', 'POST'])
 
+auth_blueprint.add_url_rule(rule='/totp_setup',
+                            view_func=totp_setup,
+                            endpoint='totp_setup',
+                            methods=['GET'])
+
+auth_blueprint.add_url_rule(rule='/totp_qrcode',
+                            view_func=totp_qrcode,
+                            endpoint='totp_qrcode',
+                            methods=['GET'])
+
+auth_blueprint.add_url_rule(rule='/totp_verification',
+                            view_func=totp_verification,
+                            endpoint='totp_verification',
+                            methods=['GET', 'POST'])
+
 auth_blueprint.add_url_rule(rule='/logout',
                             view_func=logout,
                             endpoint='logout',

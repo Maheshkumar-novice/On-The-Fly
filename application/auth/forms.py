@@ -1,4 +1,3 @@
-from flask import session
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import EmailField, PasswordField, StringField, TelField
@@ -6,7 +5,6 @@ from wtforms.validators import (DataRequired, Email, EqualTo, Length, Regexp,
                                 ValidationError)
 
 from application.auth.models import User
-from lib.mailer import check_verification_token
 
 
 class UserRegistrationForm(FlaskForm):
@@ -43,19 +41,24 @@ class UserLoginForm(FlaskForm):
             raise ValidationError('User not exist.')
 
 
-class EmailVerificationForm(FlaskForm):
+class VerificationForm(FlaskForm):
     code = StringField('Code', validators=[DataRequired(), Length(
         min=6, max=6), Regexp(regex='^\d{6}$')], description='Verification Code')
 
+
+class EmailVerificationForm(VerificationForm):
     def validate_code(self, code):
-        if not check_verification_token(current_user.email, code.data):
+        if not current_user.check_email_verification_token(code.data):
             raise ValidationError('Incorrect Verification Code.')
 
 
-class MobileVerificationForm(FlaskForm):
-    code = StringField('Code', validators=[DataRequired(), Length(
-        min=6, max=6), Regexp(regex='^\d{6}$')], description='Verification Code')
-
+class MobileVerificationForm(VerificationForm):
     def validate_code(self, code):
-        if not check_verification_token(current_user.mobile_no, code.data):
+        if not current_user.check_mobile_no_verification_token(code.data):
+            raise ValidationError('Incorrect Verification Code.')
+
+
+class TOTPVerificationForm(VerificationForm):
+    def validate_code(self, code):
+        if not current_user.check_totp(code.data):
             raise ValidationError('Incorrect Verification Code.')

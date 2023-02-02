@@ -2,10 +2,14 @@
   {% set action_url = url_for('auth.email_verification') %}
   {% set button_value = 'Verify Code' %}
   {% set legend = 'Email Verification Code' %}
-{% else %}
+{% elif template_type == 'mobile' %}
   {% set action_url = url_for('auth.mobile_verification') %}
   {% set button_value = 'Verify Code' %}
   {% set legend = 'Mobile Verification Code' %}
+{% else %} 
+  {% set action_url = url_for('auth.totp_verification') %}
+  {% set button_value = 'Verify TOTP' %}
+  {% set legend = 'TOTP' %}
 {% endif %}
 
 
