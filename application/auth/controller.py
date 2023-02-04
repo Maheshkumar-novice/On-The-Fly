@@ -1,3 +1,4 @@
+from datetime import datetime
 from io import BytesIO
 
 import pyotp
@@ -8,7 +9,7 @@ from flask_login import current_user, login_required, login_user, logout_user
 from application import db
 from application.auth.constants import BUSINESS_ROLE, CUSTOMER_ROLE
 from application.auth.forms import *
-from application.auth.models import Role, User
+from application.auth.models import *
 
 
 def signup():
@@ -149,6 +150,50 @@ def totp_verification():
         return redirect(url_for('home'))
 
     return render_template('verification.html', form=form, template_type='totp')
+
+
+def forgot_password():
+    form = ForgotPasswordForm()
+
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user.is_eligible_for_password_reset():
+            user.send_password_reset_mail()
+            flash('Please check your mail to reset your password.', category='info')
+            return redirect(url_for('auth.forgot_password'))
+
+        flash(
+            f'Please wait for {user.get_remaining_time_for_next_password_reset_in_minutes()} minutes before reset your password again.',
+            category='info')
+        return redirect(url_for('auth.forgot_password'))
+
+    return render_template('forgot_password.html', form=form)
+
+
+def password_reset(token):
+    if UserPasswordResetToken.query.filter_by(token=token).first():
+        flash('Token is already used. Please try again.', category='error')
+        return redirect(url_for('auth.forgot_password'))
+
+    user = User.create_from_password_reset_token(token)
+    if not user:
+        flash(
+            'Either the token is expired or invalid for password reset. Please try again.',
+            category='error')
+        return redirect(url_for('auth.forgot_password'))
+
+    form = PasswordResetForm()
+
+    if form.validate_on_submit():
+        user.set_password(form.password.data)
+        user.last_password_reset_at = datetime.now()
+        db.session.add(user)
+        db.session.add(UserPasswordResetToken(token=token))
+        db.session.commit()
+        flash('Password reset success.', category='info')
+        return redirect(url_for('home'))
+
+    return render_template('password_reset.html', form=form, token=token)
 
 
 def logout():

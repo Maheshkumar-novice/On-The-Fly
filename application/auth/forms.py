@@ -62,3 +62,20 @@ class TOTPVerificationForm(VerificationForm):
     def validate_code(self, code):
         if not current_user.check_totp(code.data):
             raise ValidationError('Incorrect Verification Code.')
+
+
+class ForgotPasswordForm(FlaskForm):
+    email = EmailField('Email', validators=[
+        DataRequired(), Email()], description='Email')
+
+    def validate_email(self, email):
+        user = User.query.filter_by(email=email.data).first()
+        if user is None:
+            raise ValidationError('User not exist.')
+
+
+class PasswordResetForm(FlaskForm):
+    password = PasswordField('Password', validators=[
+                             DataRequired(), Length(min=8, max=50), Regexp(regex='(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,50}')], description='Password')
+    repeat_password = PasswordField('Repeat Password', validators=[
+                                    DataRequired(), Length(min=6, max=50), EqualTo('password'), Regexp(regex='(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,50}')], description='Repeat Password')

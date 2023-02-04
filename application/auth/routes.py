@@ -46,6 +46,16 @@ auth_blueprint.add_url_rule(rule='/totp_verification',
                             endpoint='totp_verification',
                             methods=['GET', 'POST'])
 
+auth_blueprint.add_url_rule(rule='/forgot_password',
+                            view_func=forgot_password,
+                            endpoint='forgot_password',
+                            methods=['GET', 'POST'])
+
+auth_blueprint.add_url_rule(rule='/password_reset/<token>',
+                            view_func=password_reset,
+                            endpoint='password_reset',
+                            methods=['GET', 'POST'])
+
 auth_blueprint.add_url_rule(rule='/logout',
                             view_func=logout,
                             endpoint='logout',

@@ -91,4 +91,20 @@
             DROP COLUMN totp_identity;
         </sql>
     </changeSet>
+    <changeSet id="11" author="Maheshkumar">
+        <sql>
+            ALTER TABLE public.users
+            ADD COLUMN last_password_reset_at timestamp NULL;
+        </sql>
+    </changeSet>
+    <changeSet id="12" author="Maheshkumar">
+        <sql>
+            CREATE TABLE public.used_password_reset_tokens (
+                id bigserial NOT NULL,
+                token varchar(300) NOT NULL,
+                created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                CONSTRAINT pk_used_password_reset_tokens PRIMARY KEY (id)
+            );
+        </sql>
+    </changeSet>
 </databaseChangeLog>
