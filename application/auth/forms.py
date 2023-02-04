@@ -14,7 +14,7 @@ class UserRegistrationForm(FlaskForm):
     mobile_no = TelField('Mobile No', validators=[DataRequired(), Length(
         min=10, max=10), Regexp(regex='^\d{10}$')], description='Mobile No')
     password = PasswordField('Password', validators=[
-                             DataRequired(), Length(min=6, max=50), Regexp(regex='(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,50}')], description='Password')
+                             DataRequired(), Length(min=8, max=50), Regexp(regex='(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,50}')], description='Password')
     repeat_password = PasswordField('Repeat Password', validators=[
                                     DataRequired(), Length(min=6, max=50), EqualTo('password'), Regexp(regex='(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,50}')], description='Repeat Password')
 
@@ -33,7 +33,7 @@ class UserLoginForm(FlaskForm):
     email = EmailField('Email', validators=[
         DataRequired(), Email()], description='Email')
     password = PasswordField('Password', validators=[
-                             DataRequired(), Length(min=6, max=50), Regexp(regex='(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,50}')], description='Password')
+                             DataRequired(), Length(min=8, max=50), Regexp(regex='(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,50}')], description='Password')
 
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data).first()
