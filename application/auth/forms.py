@@ -8,9 +8,16 @@ from application.auth.models import User
 from lib.external_services import check_mobile_no_verification_code, check_totp
 
 
-def password_field(label='Password'):
-    return PasswordField(label, validators=[
-        DataRequired(), Length(min=8, max=50), Regexp(regex='(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,50}')], description=label)
+def password_field(type='password'):
+    label = 'Password'
+    validators = [
+        DataRequired(), Length(min=8, max=50), Regexp(regex='/^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,50}$/')]
+
+    if type == 'repeat_password':
+        label = 'Repeat Password'
+        validators.append(EqualTo('password'))
+
+    return PasswordField(label, validators=validators, description=label)
 
 
 class UserRegistrationForm(FlaskForm):
@@ -20,7 +27,7 @@ class UserRegistrationForm(FlaskForm):
     mobile_no = TelField('Mobile No', validators=[DataRequired(), Length(
         min=10, max=10), Regexp(regex='^\d{10}$')], description='Mobile No')
     password = password_field()
-    repeat_password = password_field(label='Repeat Password')
+    repeat_password = password_field(type='repeat_password')
 
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data).first()
@@ -37,8 +44,7 @@ class UserRegistrationForm(FlaskForm):
 class UserLoginForm(FlaskForm):
     email = EmailField('Email', validators=[
         DataRequired(), Email()], description='Email')
-    password = PasswordField('Password', validators=[
-                             DataRequired(), Length(min=8, max=50), Regexp(regex='(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,50}')], description='Password')
+    password = password_field()
 
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data).first()
@@ -81,4 +87,4 @@ class ForgotPasswordForm(FlaskForm):
 
 class PasswordResetForm(FlaskForm):
     password = password_field()
-    repeat_password = password_field(label='Repeat Password')
+    repeat_password = password_field(type='repeat_password')
