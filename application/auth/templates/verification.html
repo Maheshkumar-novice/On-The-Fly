@@ -23,5 +23,11 @@
   
   <div class="container">
     {{macros.render_generic_form(form, action_url, legend, button_value)}}
+
+    {% if template_type in ['email', 'mobile'] %} 
+      <div class="container has-text-centered">
+        <a href="{{url_for('auth.security_measures')}}">Get Code Again?</a>
+      </div>
+    {% endif %}
   </div>
 {% endblock %}

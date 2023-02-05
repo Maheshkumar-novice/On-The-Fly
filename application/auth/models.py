@@ -36,7 +36,9 @@ class User(db.Model, UserMixin):
     is_mobile_verified = Column(Boolean, nullable=False, default=False)
     is_totp_enabled = Column(Boolean, nullable=False, default=False)
     totp_secret = Column(String(200), nullable=False, default='')
-    last_password_reset_at = Column(DateTime, nullable=True)
+    last_password_reset_sent_at = Column(DateTime, nullable=True)
+    last_email_verification_sent_at = Column(DateTime, nullable=True)
+    last_mobile_verification_sent_at = Column(DateTime, nullable=True)
     created_at = Column(DateTime, nullable=False, default=datetime.now)
     updated_at = Column(DateTime, nullable=False,
                         default=datetime.now, onupdate=datetime.now)
@@ -81,28 +83,22 @@ class User(db.Model, UserMixin):
         self.sendgrid_mail_client.send(message)
 
     def is_eligible_for_password_reset(self):
-        if not self.last_password_reset_at:
-            return True
+        return self._is_time_limit_reached(self.last_password_reset_sent_at)
 
-        time_difference_in_seconds = (
-            datetime.now() - self.last_password_reset_at).total_seconds()
-        if time_difference_in_seconds > Config.TIME_DIFFERENCE_BETWEEN_PASSWORD_RESESTS_IN_SECONDS:
-            return True
-        return False
+    def is_eligible_for_email_verification(self):
+        return self._is_time_limit_reached(self.last_email_verification_sent_at)
 
-    def get_remaining_time_for_next_password_reset_in_minutes(self):
-        if not self.last_password_reset_at:
-            return 0
+    def is_eligible_for_mobile_verification(self):
+        return self._is_time_limit_reached(self.last_mobile_verification_sent_at)
 
-        time_difference_in_seconds = (
-            datetime.now() - self.last_password_reset_at).total_seconds()
-        return int((Config.TIME_DIFFERENCE_BETWEEN_PASSWORD_RESESTS_IN_SECONDS - time_difference_in_seconds) // 60)
+    def get_remaining_time_for_next_password_reset(self):
+        return self._get_remaining_time_to_reach_limit(self.last_password_reset_sent_at)
 
-    def _get_password_reset_token(self):
-        return jwt.encode({'id': self.id,
-                           'exp': time() + Config.JWT_VALIDITY_FOR_PASSWORD_RESET_IN_SECONDS},
-                          key=Config.SECRET_KEY,
-                          algorithm='HS256')
+    def get_remaining_time_for_next_email_verification(self):
+        return self._get_remaining_time_to_reach_limit(self.last_email_verification_sent_at)
+
+    def get_remaining_time_for_next_mobile_verification(self):
+        return self._get_remaining_time_to_reach_limit(self.last_mobile_verification_sent_at)
 
     def _send_verification(self, to, type):
         self.twilio_mail_client.verify \
@@ -116,6 +112,34 @@ class User(db.Model, UserMixin):
             .verification_checks \
             .create(to=to, code=token)
         return check.status == 'approved'
+
+    def _get_password_reset_token(self):
+        return jwt.encode({'id': self.id,
+                           'exp': time() + Config.JWT_VALIDITY_FOR_PASSWORD_RESET_IN_SECONDS},
+                          key=Config.SECRET_KEY,
+                          algorithm='HS256')
+
+    def _is_time_limit_reached(self, stored_time):
+        time_limit = Config.TIME_LIMIT_NEEDED_FOR_RESEND
+        if (not stored_time) or (self._get_time_passed_since(stored_time) > time_limit):
+            return True
+        return False
+
+    def _get_remaining_time_to_reach_limit(self, stored_time):
+        time_limit = Config.TIME_LIMIT_NEEDED_FOR_RESEND
+        if not stored_time:
+            return 0
+
+        time_passed = self._get_time_passed_since(stored_time)
+        remaining_time = time_limit - time_passed
+
+        if remaining_time < 0:
+            return 0
+
+        return remaining_time
+
+    def _get_time_passed_since(self, timestamp):
+        return (datetime.now() - timestamp).total_seconds()
 
     @staticmethod
     def create_from_password_reset_token(token):

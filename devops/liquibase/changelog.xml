@@ -107,4 +107,22 @@
             );
         </sql>
     </changeSet>
+    <changeSet id="13" author="Maheshkumar">
+        <sql>
+            ALTER TABLE public.users
+            ADD COLUMN last_email_verification_sent_at timestamp NULL;
+        </sql>
+    </changeSet>
+    <changeSet id="14" author="Maheshkumar">
+        <sql>
+            ALTER TABLE public.users
+            ADD COLUMN last_mobile_verification_sent_at timestamp NULL;
+        </sql>
+    </changeSet>
+    <changeSet id="15" author="Maheshkumar">
+        <sql>
+            ALTER TABLE public.users
+            RENAME COLUMN last_password_reset_at TO last_password_reset_sent_at;
+        </sql>
+    </changeSet>
 </databaseChangeLog>

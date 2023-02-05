@@ -62,11 +62,29 @@ def login():
 @login_required
 def security_measures():
     if not current_user.is_email_verified:
-        current_user.send_email_verification()
+        if current_user.is_eligible_for_email_verification():
+            current_user.last_email_verification_sent_at = datetime.now()
+            db.session.add(current_user)
+            db.session.commit()
+            current_user.send_email_verification()
+            flash(
+                'Please check your mail to get the code. You can also try again using Get Code Again, if needed.', category='info')
+        else:
+            flash(
+                current_user.get_remaining_time_for_next_email_verification(), category='timer')
         return redirect(url_for('auth.email_verification'))
 
     if not current_user.is_mobile_verified:
-        current_user.send_mobile_no_verification()
+        if current_user.is_eligible_for_mobile_verification():
+            current_user.last_mobile_verification_sent_at = datetime.now()
+            db.session.add(current_user)
+            db.session.commit()
+            current_user.send_mobile_no_verification()
+            flash(
+                'Please check your mobile to get the code. You can also try again using Get Code Again, if needed.', category='info')
+        else:
+            flash(
+                current_user.get_remaining_time_for_next_email_verification(), category='timer')
         return redirect(url_for('auth.mobile_verification'))
 
     if not current_user.is_totp_enabled:
@@ -158,13 +176,15 @@ def forgot_password():
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user.is_eligible_for_password_reset():
+            user.last_password_reset_sent_at = datetime.now()
+            db.session.add(user)
+            db.session.commit()
             user.send_password_reset_mail()
-            flash('Please check your mail to reset your password.', category='info')
+            flash(
+                'Please check your mail to reset your password. You can also try again by filling the form, if needed.', category='info')
             return redirect(url_for('auth.forgot_password'))
 
-        flash(
-            f'Please wait for {user.get_remaining_time_for_next_password_reset_in_minutes()} minutes before reset your password again.',
-            category='info')
+        flash(user.get_remaining_time_for_next_password_reset(), category='timer')
         return redirect(url_for('auth.forgot_password'))
 
     return render_template('forgot_password.html', form=form)
@@ -186,7 +206,6 @@ def password_reset(token):
 
     if form.validate_on_submit():
         user.set_password(form.password.data)
-        user.last_password_reset_at = datetime.now()
         db.session.add(user)
         db.session.add(UserPasswordResetToken(token=token))
         db.session.commit()

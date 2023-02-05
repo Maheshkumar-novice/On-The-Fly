@@ -3,12 +3,14 @@
         {% for category, message in messages %}
             {% if category == 'error' %} 
                 {% set type_modifier = 'is-danger' %} 
-            {% else %} 
+            {% elif category == 'info' %} 
                 {% set type_modifier = 'is-info' %} 
-            {% endif %}
+            {% elif category == 'timer' %}
+                {% set type_modifier = 'is-info is-timer' %}
+            {% endif %} 
             <div class="notification {{type_modifier}} is-light">
                 <button class="delete"></button>
-                {{message}}
+                <p class="flash-message">{{message}}</p>
             </div>
         {% endfor %}
     {% endif %}
