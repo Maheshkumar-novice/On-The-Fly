@@ -125,4 +125,18 @@
             RENAME COLUMN last_password_reset_at TO last_password_reset_sent_at;
         </sql>
     </changeSet>
+    <changeSet id="16" author="Maheshkumar">
+        <sql>
+            CREATE TABLE public.email_verification_codes (
+                id bigserial NOT NULL,
+                user_id bigint NOT NULL,
+                verification_code varchar(10) NOT NULL,
+                created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                CONSTRAINT pk_email_verification_codes PRIMARY KEY (id),
+                CONSTRAINT fk_email_verification_codes_user_id FOREIGN KEY (user_id) REFERENCES public.users(id),
+                CONSTRAINT email_verification_codes_user_id_unique UNIQUE (user_id)
+            );
+        </sql>
+    </changeSet>
 </databaseChangeLog>

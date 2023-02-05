@@ -16,6 +16,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from application import db
 from application.auth.constants import USER_ROLES_ENUM
 from config import Config
+from random import randint
 
 
 class User(db.Model, UserMixin):
@@ -43,6 +44,8 @@ class User(db.Model, UserMixin):
     updated_at = Column(DateTime, nullable=False,
                         default=datetime.now, onupdate=datetime.now)
     role = relationship('Role', back_populates='users')
+    email_verification_code = relationship(
+        'EmailVerificationCode', cascade='all, delete', back_populates='user', uselist=False)
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -51,13 +54,33 @@ class User(db.Model, UserMixin):
         return check_password_hash(self.password_hash, password)
 
     def send_email_verification(self):
-        self._send_verification(self.email, type='email')
+        verification_code = pyotp.otp.OTP(
+            pyotp.random_base32()).generate_otp(randint(1, 100000))
+        if self.email_verification_code:
+            email_verification_code = self.email_verification_code
+            self.email_verification_code.verification_code = verification_code
+        else:
+            email_verification_code = EmailVerificationCode(
+                user_id=self.id, verification_code=verification_code)
+        db.session.add(email_verification_code)
+        db.session.commit()
+
+        message = Mail(
+            from_email=Config.SENDGRID_SENDER_EMAIL,
+            to_emails=self.email
+        )
+        message.dynamic_template_data = {
+            'twilio_message': f'On The Fly verification code is {verification_code}'
+        }
+        message.template_id = Config.SENDGRID_EMAIL_VERIFICATION_TEMPLATE_ID
+        self.sendgrid_mail_client.send(message)
 
     def send_mobile_no_verification(self):
         self._send_verification(self.mobile_no, type='sms')
 
     def check_email_verification_token(self, token):
-        return self._check_verification_token(self.email, token)
+        verification_code = self.email_verification_code.verification_code
+        return verification_code == token
 
     def check_mobile_no_verification_token(self, token):
         return self._check_verification_token(self.mobile_no, token)
@@ -172,3 +195,16 @@ class UserPasswordResetToken(db.Model):
                 nullable=False, autoincrement=True)
     token = Column(String, nullable=False)
     created_at = Column(DateTime, nullable=False, default=datetime.now)
+
+
+class EmailVerificationCode(db.Model):
+    __tablename__ = 'email_verification_codes'
+
+    id = Column(Integer, primary_key=True,
+                nullable=False, autoincrement=True)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    verification_code = Column(String(10), nullable=False)
+    created_at = Column(DateTime, nullable=False, default=datetime.now)
+    updated_at = Column(DateTime, nullable=False,
+                        default=datetime.now, onupdate=datetime.now)
+    user = relationship('User', back_populates='email_verification_code')
