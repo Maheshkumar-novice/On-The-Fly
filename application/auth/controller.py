@@ -1,6 +1,9 @@
 from datetime import datetime
 from io import BytesIO
+from random import randint
+from time import time
 
+import jwt
 import pyotp
 import pyqrcode
 from flask import flash, redirect, render_template, request, session, url_for
@@ -10,6 +13,12 @@ from application import db
 from application.auth.constants import BUSINESS_ROLE, CUSTOMER_ROLE
 from application.auth.forms import *
 from application.auth.models import *
+from config import Config
+from lib.external_services import (get_totp_uri, send_mobile_no_verification,
+                                   send_password_reset_mail,
+                                   send_verification_mail)
+from lib.time_utils import (get_remaining_time_to_reach_eligibility,
+                               is_eligible_for_retry)
 
 
 def signup():
@@ -24,7 +33,7 @@ def signup():
         user_data = {
             'name': form.name.data,
             'email': form.email.data,
-            'mobile_no': f'+91{form.mobile_no.data}',
+            'mobile_no': User.format_mobile_no(form.mobile_no.data),
             'role_id': Role.query.filter_by(role_name=account_type).first().id
         }
         user = User(**user_data)
@@ -62,29 +71,46 @@ def login():
 @login_required
 def security_measures():
     if not current_user.is_email_verified:
-        if current_user.is_eligible_for_email_verification():
+        if is_eligible_for_retry(current_user.last_email_verification_sent_at):
             current_user.last_email_verification_sent_at = datetime.now()
             db.session.add(current_user)
             db.session.commit()
-            current_user.send_email_verification()
+
+            verification_code = pyotp.otp.OTP(
+                pyotp.random_base32()).generate_otp(randint(1, 100000))
+
+            if current_user.email_verification_code:
+                email_verification_code = current_user.email_verification_code
+                current_user.email_verification_code.verification_code = verification_code
+            else:
+                email_verification_code = EmailVerificationCode(
+                    user_id=current_user.id, verification_code=verification_code)
+
+            db.session.add(email_verification_code)
+            db.session.commit()
+
+            send_verification_mail(current_user.email, verification_code)
+
             flash(
                 'Please check your mail to get the code. You can also try again using Get Code Again, if needed.', category='info')
         else:
-            flash(
-                current_user.get_remaining_time_for_next_email_verification(), category='timer')
+            flash(get_remaining_time_to_reach_eligibility(
+                current_user.last_email_verification_sent_at), category='timer')
         return redirect(url_for('auth.email_verification'))
 
     if not current_user.is_mobile_verified:
-        if current_user.is_eligible_for_mobile_verification():
+        if is_eligible_for_retry(current_user.last_mobile_verification_sent_at):
             current_user.last_mobile_verification_sent_at = datetime.now()
             db.session.add(current_user)
             db.session.commit()
-            current_user.send_mobile_no_verification()
+
+            send_mobile_no_verification(current_user.mobile_no)
+
             flash(
                 'Please check your mobile to get the code. You can also try again using Get Code Again, if needed.', category='info')
         else:
-            flash(
-                current_user.get_remaining_time_for_next_email_verification(), category='timer')
+            flash(get_remaining_time_to_reach_eligibility(
+                current_user.last_mobile_verification_sent_at), category='timer')
         return redirect(url_for('auth.mobile_verification'))
 
     if not current_user.is_totp_enabled:
@@ -144,10 +170,11 @@ def totp_qrcode():
     if current_user.is_totp_enabled:
         return redirect(url_for('auth.security_measures'))
 
-    uri = current_user.create_totp_uri()
+    uri = get_totp_uri(current_user.email, current_user.totp_secret)
     stream = BytesIO()
     url = pyqrcode.create(uri)
     url.svg(stream, scale=5)
+
     return stream.getvalue(), {
         'Content-Type': 'image/svg+xml',
         'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -175,16 +202,24 @@ def forgot_password():
 
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-        if user.is_eligible_for_password_reset():
+        if is_eligible_for_retry(user.last_password_reset_sent_at):
             user.last_password_reset_sent_at = datetime.now()
             db.session.add(user)
             db.session.commit()
-            user.send_password_reset_mail()
+
+            token = jwt.encode({'id': user.id,
+                                'exp': time() + Config.JWT_VALIDITY_FOR_PASSWORD_RESET_IN_SECONDS},
+                               key=Config.SECRET_KEY,
+                               algorithm='HS256')
+            url = url_for('auth.password_reset', token=token, _external=True)
+            send_password_reset_mail(user.email, url)
+
             flash(
                 'Please check your mail to reset your password. You can also try again by filling the form, if needed.', category='info')
             return redirect(url_for('auth.forgot_password'))
 
-        flash(user.get_remaining_time_for_next_password_reset(), category='timer')
+        flash(get_remaining_time_to_reach_eligibility(
+            user.last_password_reset_sent_at), category='timer')
         return redirect(url_for('auth.forgot_password'))
 
     return render_template('forgot_password.html', form=form)
@@ -195,7 +230,14 @@ def password_reset(token):
         flash('Token is already used. Please try again.', category='error')
         return redirect(url_for('auth.forgot_password'))
 
-    user = User.create_from_password_reset_token(token)
+    try:
+        id = jwt.decode(token, key=Config.SECRET_KEY,
+                        algorithms=['HS256'])['id']
+    except Exception as e:
+        print(e)
+        id = None
+
+    user = User.query.filter_by(id=id).first()
     if not user:
         flash(
             'Either the token is expired or invalid for password reset. Please try again.',

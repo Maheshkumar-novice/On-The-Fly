@@ -5,11 +5,12 @@ from wtforms.validators import (DataRequired, Email, EqualTo, Length, Regexp,
                                 ValidationError)
 
 from application.auth.models import User
+from lib.external_services import check_mobile_no_verification_code, check_totp
 
 
 def password_field(label='Password'):
     return PasswordField(label, validators=[
-        DataRequired(), Length(min=8, max=50), Regexp(regex='/^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,50}$/')], description=label)
+        DataRequired(), Length(min=8, max=50), Regexp(regex='(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,50}')], description=label)
 
 
 class UserRegistrationForm(FlaskForm):
@@ -27,7 +28,8 @@ class UserRegistrationForm(FlaskForm):
             raise ValidationError('Please use a different email address.')
 
     def validate_mobile_no(self, mobile_no):
-        user = User.query.filter_by(mobile_no=mobile_no.data).first()
+        mobile_no = User.format_mobile_no(mobile_no.data)
+        user = User.query.filter_by(mobile_no=mobile_no).first()
         if user is not None:
             raise ValidationError('Please use a different mobile number.')
 
@@ -51,19 +53,19 @@ class VerificationForm(FlaskForm):
 
 class EmailVerificationForm(VerificationForm):
     def validate_code(self, code):
-        if not current_user.check_email_verification_token(code.data):
+        if current_user.email_verification_code.verification_code != code.data:
             raise ValidationError('Incorrect Verification Code.')
 
 
 class MobileVerificationForm(VerificationForm):
     def validate_code(self, code):
-        if not current_user.check_mobile_no_verification_token(code.data):
+        if not check_mobile_no_verification_code(current_user.mobile_no, code.data):
             raise ValidationError('Incorrect Verification Code.')
 
 
 class TOTPVerificationForm(VerificationForm):
     def validate_code(self, code):
-        if not current_user.check_totp(code.data):
+        if not check_totp(current_user.totp_secret, code.data):
             raise ValidationError('Incorrect Verification Code.')
 
 
