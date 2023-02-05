@@ -34,4 +34,17 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }, 1000)
   });
+
+  (document.querySelectorAll("input[type='password']") || []).forEach(($input) => {
+    const passwordRegExp = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,50}$/;
+    $input.addEventListener("input", () => {
+      $passwordHelpText = $input.nextElementSibling
+      if (!passwordRegExp.test($input.value)) {
+        $passwordHelpText.classList.remove("is-hidden");
+      }
+      else {
+        $passwordHelpText.classList.add("is-hidden");
+      }
+    })
+  })
 });

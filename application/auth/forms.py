@@ -7,16 +7,19 @@ from wtforms.validators import (DataRequired, Email, EqualTo, Length, Regexp,
 from application.auth.models import User
 
 
+def password_field(label='Password'):
+    return PasswordField(label, validators=[
+        DataRequired(), Length(min=8, max=50), Regexp(regex='/^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,50}$/')], description=label)
+
+
 class UserRegistrationForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()], description='Name')
     email = EmailField('Email', validators=[
         DataRequired(), Email()], description='Email')
     mobile_no = TelField('Mobile No', validators=[DataRequired(), Length(
         min=10, max=10), Regexp(regex='^\d{10}$')], description='Mobile No')
-    password = PasswordField('Password', validators=[
-                             DataRequired(), Length(min=8, max=50), Regexp(regex='(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,50}')], description='Password')
-    repeat_password = PasswordField('Repeat Password', validators=[
-                                    DataRequired(), Length(min=6, max=50), EqualTo('password'), Regexp(regex='(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,50}')], description='Repeat Password')
+    password = password_field()
+    repeat_password = password_field(label='Repeat Password')
 
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data).first()
@@ -75,7 +78,5 @@ class ForgotPasswordForm(FlaskForm):
 
 
 class PasswordResetForm(FlaskForm):
-    password = PasswordField('Password', validators=[
-                             DataRequired(), Length(min=8, max=50), Regexp(regex='(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,50}')], description='Password')
-    repeat_password = PasswordField('Repeat Password', validators=[
-                                    DataRequired(), Length(min=6, max=50), EqualTo('password'), Regexp(regex='(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,50}')], description='Repeat Password')
+    password = password_field()
+    repeat_password = password_field(label='Repeat Password')
