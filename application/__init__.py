@@ -8,7 +8,6 @@ from config import APP_SETTINGS, Config
 db = SQLAlchemy()
 login_manager = LoginManager()
 login_manager.login_view = 'home'
-mail_client = Client(Config.TWILIO_ACCOUNT_SID, Config.TWILIO_AUTH_TOKEN)
 
 
 def create_app():
