@@ -5,7 +5,7 @@
                 {{field.label(class='label')}} 
                 <div class="control">
                 {% if field.type.lower() == 'passwordfield' %}
-                    {{field(placeholder=field.description, class='input', pattern='/^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,50}$/')}}                  
+                    {{field(placeholder=field.description, class='input', pattern='(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,50}')}}                  
                     <p class="block help is-danger is-hidden">
                         Password must contain total of at least 8 characters with
                         at least one upper case, one lower case, one special character and one number.
