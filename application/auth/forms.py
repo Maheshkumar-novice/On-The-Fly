@@ -10,8 +10,8 @@ from lib.external_services import check_mobile_no_verification_code, check_totp
 
 def password_field(type='password'):
     label = 'Password'
-    validators = [
-        DataRequired(), Length(min=8, max=50), Regexp(regex='/^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,50}$/')]
+    validators = [  
+        DataRequired(), Length(min=8, max=50), Regexp(regex='(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,50}')]
 
     if type == 'repeat_password':
         label = 'Repeat Password'
