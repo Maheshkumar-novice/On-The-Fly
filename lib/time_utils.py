@@ -1,17 +1,17 @@
 from datetime import datetime
 
-from config import Config
+from flask import current_app
 
 
 def is_eligible_for_retry(stored_time):
-    time_limit = Config.TIME_LIMIT_NEEDED_FOR_RESEND
+    time_limit = current_app.config['TIME_LIMIT_NEEDED_FOR_RESEND']
     if (not stored_time) or (_get_time_passed_since(stored_time) > time_limit):
         return True
     return False
 
 
 def get_remaining_time_to_reach_eligibility(stored_time):
-    time_limit = Config.TIME_LIMIT_NEEDED_FOR_RESEND
+    time_limit = current_app.config['TIME_LIMIT_NEEDED_FOR_RESEND']
     if not stored_time:
         return 0
 

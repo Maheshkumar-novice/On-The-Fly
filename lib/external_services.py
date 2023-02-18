@@ -1,9 +1,8 @@
 import pyotp
+from flask import current_app
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from twilio.rest import Client
-
-from config import Config
 
 
 def send_verification_mail(email, verification_code):
@@ -11,7 +10,7 @@ def send_verification_mail(email, verification_code):
     message.dynamic_template_data = {
         'twilio_message': f'On The Fly verification code is {verification_code}'
     }
-    message.template_id = Config.SENDGRID_EMAIL_VERIFICATION_TEMPLATE_ID
+    message.template_id = current_app.config['SENDGRID_EMAIL_VERIFICATION_TEMPLATE_ID']
 
     _send_sendgrid_mail(message)
 
@@ -21,7 +20,7 @@ def send_password_reset_mail(email, url):
     message.dynamic_template_data = {
         'password_reset_link': url
     }
-    message.template_id = Config.SENDGRID_PASSWORD_RESET_TEMPLATE_ID
+    message.template_id = current_app.config['SENDGRID_PASSWORD_RESET_TEMPLATE_ID']
     _send_sendgrid_mail(message)
 
 
@@ -44,14 +43,14 @@ def check_totp(totp_secret, totp):
 
 def _get_sendgrid_message(email):
     return Mail(
-        from_email=Config.SENDGRID_SENDER_EMAIL,
+        from_email=current_app.config['SENDGRID_SENDER_EMAIL'],
         to_emails=email
     )
 
 
 def _send_sendgrid_mail(message):
-    SendGridAPIClient(Config.SENDGRID_API_KEY).send(message)
+    SendGridAPIClient(current_app.config['SENDGRID_API_KEY']).send(message)
 
 
 def _get_twilio_client_verify_service():
-    return Client(Config.TWILIO_ACCOUNT_SID, Config.TWILIO_AUTH_TOKEN).verify.services(Config.TWILIO_VERIFY_SERVICE)
+    return Client(current_app.config['TWILIO_ACCOUNT_SID'], current_app.config['TWILIO_AUTH_TOKEN']).verify.services(current_app.config['TWILIO_VERIFY_SERVICE'])

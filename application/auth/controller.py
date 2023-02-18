@@ -6,19 +6,19 @@ from time import time
 import jwt
 import pyotp
 import pyqrcode
-from flask import flash, redirect, render_template, request, session, url_for
+from flask import (current_app, flash, redirect, render_template, request,
+                   session, url_for)
 from flask_login import current_user, login_required, login_user, logout_user
 
 from application import db
 from application.auth.constants import BUSINESS_ROLE, CUSTOMER_ROLE
 from application.auth.forms import *
 from application.auth.models import *
-from config import Config
 from lib.external_services import (get_totp_uri, send_mobile_no_verification,
                                    send_password_reset_mail,
                                    send_verification_mail)
 from lib.time_utils import (get_remaining_time_to_reach_eligibility,
-                               is_eligible_for_retry)
+                            is_eligible_for_retry)
 
 
 def signup():
@@ -208,8 +208,8 @@ def forgot_password():
             db.session.commit()
 
             token = jwt.encode({'id': user.id,
-                                'exp': time() + Config.JWT_VALIDITY_FOR_PASSWORD_RESET_IN_SECONDS},
-                               key=Config.SECRET_KEY,
+                                'exp': time() + current_app.config['JWT_VALIDITY_FOR_PASSWORD_RESET_IN_SECONDS']},
+                               key=current_app.config['SECRET_KEY'],
                                algorithm='HS256')
             url = url_for('auth.password_reset', token=token, _external=True)
             send_password_reset_mail(user.email, url)
@@ -231,7 +231,7 @@ def password_reset(token):
         return redirect(url_for('auth.forgot_password'))
 
     try:
-        id = jwt.decode(token, key=Config.SECRET_KEY,
+        id = jwt.decode(token, key=current_app.config['SECRET_KEY'],
                         algorithms=['HS256'])['id']
     except Exception as e:
         print(e)
