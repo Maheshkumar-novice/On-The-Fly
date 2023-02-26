@@ -14,13 +14,13 @@ from application import db
 from application.auth.constants import BUSINESS_ROLE, CUSTOMER_ROLE
 from application.auth.forms import *
 from application.auth.models import *
+from application.business.models import BusinessInformation
 from lib.external_services import (get_totp_uri, send_mobile_no_verification,
                                    send_password_reset_mail,
                                    send_verification_mail)
 from lib.time_utils import (get_remaining_time_to_reach_eligibility,
                             is_eligible_for_retry)
 
-from application.business.models import BusinessInformation
 
 def signup():
     if not current_user.is_anonymous:

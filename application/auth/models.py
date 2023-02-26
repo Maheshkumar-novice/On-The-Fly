@@ -4,11 +4,11 @@ from flask_login import UserMixin
 from sqlalchemy import (Boolean, Column, DateTime, Enum, ForeignKey, Integer,
                         String)
 from sqlalchemy.orm import relationship
+from sqlalchemy_serializer import SerializerMixin
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from application import db
 from application.auth.constants import USER_ROLES_ENUM
-from sqlalchemy_serializer import SerializerMixin
 
 
 class User(db.Model, UserMixin, SerializerMixin):

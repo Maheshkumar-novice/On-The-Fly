@@ -1,7 +1,6 @@
-from flask import Flask, render_template, redirect, url_for
-from flask_login import LoginManager
+from flask import Flask, redirect, render_template, url_for
+from flask_login import LoginManager, current_user
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import current_user
 
 from config import APP_SETTINGS
 

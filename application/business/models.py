@@ -1,11 +1,10 @@
 from datetime import datetime
 
-from sqlalchemy import (Column, DateTime, ForeignKey, Integer,
-                        String)
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
+from sqlalchemy_serializer import SerializerMixin
 
 from application import db
-from sqlalchemy_serializer import SerializerMixin
 
 
 class BusinessInformation(db.Model, SerializerMixin):
