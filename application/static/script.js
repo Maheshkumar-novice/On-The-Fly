@@ -46,5 +46,24 @@ document.addEventListener("DOMContentLoaded", () => {
         $passwordHelpText.classList.add("is-hidden");
       }
     })
-  })
+  });
+  
+  const getBusinessSubTypes = async (businessType) => {
+    let response = await fetch(`/business/subtypes?type=${businessType}`);
+    return await response.json();
+  }
+  
+  const $businessSubTypeSelectElement = document.querySelector("select#business_subtype");
+  document.querySelector("select#business_type").addEventListener("change", (e) => {
+    $businessSubTypeSelectElement.innerHTML = '';
+
+    getBusinessSubTypes(e.target.value).then(businessSubTypes => {
+      for (let businessSubType of businessSubTypes) {
+        let $optionElement = document.createElement('option');
+        $optionElement.innerText = businessSubType;
+        $optionElement.setAttribute("value", businessSubType);
+        $businessSubTypeSelectElement.appendChild($optionElement);
+      }
+    })
+  });
 });

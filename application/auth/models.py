@@ -34,6 +34,8 @@ class User(db.Model, UserMixin, SerializerMixin):
     role = relationship('Role', back_populates='users')
     email_verification_code = relationship(
         'EmailVerificationCode', cascade='all, delete', back_populates='user', uselist=False)
+    business_information = relationship(
+        'BusinessInformation', cascade='all, delete', primaryjoin="and_(User.id==BusinessInformation.user_id, User.role_id==1)", uselist=False)
 
     serialize_only = ('name', 'email', 'mobile_no',
                       'is_email_verified', 'is_mobile_verified', 'is_totp_enabled')

@@ -10,6 +10,10 @@
                         Password must contain total of at least 8 characters with
                         at least one upper case, one lower case, one special character and one number.
                     </p>
+                {% elif field.type.lower() == 'selectfield' %}
+                    <div class="select is-fullwidth">
+                        {{field(placeholder=field.description)}}
+                    </div>
                 {% else %} 
                     {{field(placeholder=field.description, class='input')}}
                 {% endif %}

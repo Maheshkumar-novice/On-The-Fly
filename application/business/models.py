@@ -20,7 +20,7 @@ class BusinessInformation(db.Model, SerializerMixin):
     created_at = Column(DateTime, nullable=False, default=datetime.now)
     updated_at = Column(DateTime, nullable=False,
                         default=datetime.now, onupdate=datetime.now)
-    user = relationship('User')
+    user = relationship('User', back_populates='business_information')
     business_subtype = relationship(
         'BusinessSubType', back_populates='business_information')
 
@@ -38,6 +38,7 @@ class BusinessType(db.Model, SerializerMixin):
                         default=datetime.now, onupdate=datetime.now)
     business_subtypes = relationship(
         'BusinessSubType', cascade='all, delete', back_populates='business_type')
+    
     serialize_only = ('name')
 
 

@@ -14,4 +14,9 @@ business_buleprint.add_url_rule(rule='/home',
 business_buleprint.add_url_rule(rule='/edit',
                                 view_func=edit,
                                 endpoint='edit',
+                                methods=['GET', 'POST'])
+
+business_buleprint.add_url_rule(rule='/subtypes',
+                                view_func=business_subtypes,
+                                endpoint='business_subtypes',
                                 methods=['GET'])
