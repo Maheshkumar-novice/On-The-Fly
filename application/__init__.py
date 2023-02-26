@@ -1,6 +1,7 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect, url_for
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import current_user
 
 from config import APP_SETTINGS
 
@@ -18,10 +19,15 @@ def create_app():
 
     @app.route('/')
     def home():
+        if not current_user.is_anonymous:
+            return redirect(url_for('auth.user_home'))
+
         return render_template('home.html', navbar_type='home')
 
     from application.auth.routes import auth_blueprint
+    from application.business.routes import business_buleprint
     app.register_blueprint(auth_blueprint, url_prefix='/auth')
+    app.register_blueprint(business_buleprint, url_prefix='/business')
 
     from application.auth.models import User
 

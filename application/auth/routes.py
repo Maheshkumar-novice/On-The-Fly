@@ -60,3 +60,8 @@ auth_blueprint.add_url_rule(rule='/logout',
                             view_func=logout,
                             endpoint='logout',
                             methods=['GET'])
+
+auth_blueprint.add_url_rule(rule='/user_home',
+                            view_func=user_home,
+                            endpoint='user_home',
+                            methods=['GET'])

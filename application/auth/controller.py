@@ -20,8 +20,12 @@ from lib.external_services import (get_totp_uri, send_mobile_no_verification,
 from lib.time_utils import (get_remaining_time_to_reach_eligibility,
                             is_eligible_for_retry)
 
+from application.business.models import BusinessInformation
 
 def signup():
+    if not current_user.is_anonymous:
+        return redirect(url_for('auth.user_home'))
+
     form = UserRegistrationForm()
     account_type = request.args.get('account_type', '')
 
@@ -40,11 +44,19 @@ def signup():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
+
+        if account_type == BUSINESS_ROLE:
+            db.session.add(BusinessInformation(user_id=user.id))
+            db.session.commit()
+
         return redirect(url_for('auth.login', account_type=account_type))
     return render_template('signup.html', form=form, account_type=account_type)
 
 
 def login():
+    if not current_user.is_anonymous:
+        return redirect(url_for('auth.user_home'))
+
     form = UserLoginForm()
     account_type = request.args.get('account_type', '')
 
@@ -192,7 +204,7 @@ def totp_verification():
             db.session.add(current_user)
             db.session.commit()
         flash('Login Success.', category='info')
-        return redirect(url_for('home'))
+    return redirect(url_for('auth.user_home'))
 
     return render_template('verification.html', form=form, template_type='totp')
 
@@ -260,4 +272,14 @@ def password_reset(token):
 def logout():
     session.clear()
     logout_user()
+    return redirect(url_for('home'))
+
+
+@login_required
+def user_home():
+    user_role = Role.query.filter_by(id=current_user.role_id).scalar()
+
+    if user_role.role_name == BUSINESS_ROLE:
+        return redirect(url_for('business.home'))
+
     return redirect(url_for('home'))

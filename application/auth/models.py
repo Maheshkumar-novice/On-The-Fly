@@ -8,9 +8,10 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from application import db
 from application.auth.constants import USER_ROLES_ENUM
+from sqlalchemy_serializer import SerializerMixin
 
 
-class User(db.Model, UserMixin):
+class User(db.Model, UserMixin, SerializerMixin):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True,
@@ -33,6 +34,9 @@ class User(db.Model, UserMixin):
     role = relationship('Role', back_populates='users')
     email_verification_code = relationship(
         'EmailVerificationCode', cascade='all, delete', back_populates='user', uselist=False)
+
+    serialize_only = ('name', 'email', 'mobile_no',
+                      'is_email_verified', 'is_mobile_verified', 'is_totp_enabled')
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)

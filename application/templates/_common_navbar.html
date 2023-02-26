@@ -10,6 +10,10 @@
         <div class="navbar-item">
             <a class="button is-link" href="{{url_for('auth.login', account_type='CUSTOMER')}}">Customer</a>
         </div>
+    {% elif navbar_type == 'user' %}
+        <div class="navbar-item">
+            <a class="button is-link" href="{{url_for('auth.logout')}}">Logout</a>
+        </div>
     {% else %} 
         <div class="navbar-item">
             <a class="button is-link" href="{{url_for('home')}}">Home</a>

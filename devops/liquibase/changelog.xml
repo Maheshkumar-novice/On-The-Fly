@@ -139,4 +139,74 @@
             );
         </sql>
     </changeSet>
+    <changeSet id="17" author="Maheshkumar">
+        <sql>
+            CREATE TABLE public.business_information (
+                id bigserial NOT NULL,
+                user_id bigint NOT NULL,
+                description varchar(400) NULL,
+                gst_no varchar(100) NULL,
+                created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                CONSTRAINT pk_business_information PRIMARY KEY (id),
+                CONSTRAINT fk_business_information_user_id FOREIGN KEY (user_id) REFERENCES public.users(id)
+            );
+        </sql>
+    </changeSet>
+    <changeSet id="18" author="Maheshkumar">
+        <sql>
+            CREATE TABLE public.business_types (
+                id bigserial NOT NULL,
+                name varchar(30) NOT NULL,
+                created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                CONSTRAINT pk_business_types PRIMARY KEY (id),
+                CONSTRAINT business_types_name_unique UNIQUE (name)
+            );
+        </sql>
+    </changeSet>
+    <changeSet id="19" author="Maheshkumar">
+        <sql>
+            CREATE TABLE public.business_subtypes (
+                id bigserial NOT NULL,
+                business_type_id bigint NOT NULL,
+                name varchar(30) NOT NULL,
+                created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                CONSTRAINT pk_business_subtypes PRIMARY KEY (id),
+                CONSTRAINT fk_business_subtypes_business_type_id FOREIGN KEY (business_type_id) REFERENCES public.business_types(id),
+                CONSTRAINT business_subtypes_name_unique UNIQUE (name)
+            );
+        </sql>
+    </changeSet>
+    <changeSet id="20" author="Maheshkumar">
+        <sql>
+            ALTER TABLE public.business_information
+            ADD COLUMN business_subtype_id bigint NULL;
+        </sql>
+        <sql>
+            ALTER TABLE public.business_information
+            ADD CONSTRAINT fk_business_information_subtype_id FOREIGN KEY (business_subtype_id) REFERENCES public.business_subtypes(id);
+        </sql>
+    </changeSet>
+    <changeSet id="21" author="Maheshkumar">
+        <sql>
+            INSERT INTO public.business_types (name)
+            VALUES ('Product'), ('Service');
+        </sql>
+        <sql>
+            INSERT INTO public.business_subtypes (name, business_type_id) VALUES 
+            ('Hotel', 1),
+            ('Vegetable Shop', 1),
+            ('Grocery Shop', 1),
+            ('Stationery Shop', 1),
+            ('Mobile Service Center', 2),
+            ('Electronic Service Center', 2),
+            ('Vehicle Service Center', 2),
+            ('Hostel Service', 2),
+            ('PG Service', 2),
+            ('Hall Service', 2),
+            ('Rental House Service', 2);
+        </sql>
+    </changeSet>
 </databaseChangeLog>
