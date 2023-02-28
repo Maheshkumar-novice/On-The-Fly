@@ -9,12 +9,13 @@
   <div class="section">
     <div class="columns is-multiline">
         {% for business_item in business_items %} 
-            <div class="column is-narrow">
-                <div class="box p-3">
-                    <h1 class="title">{{business_item.name}}</h1>
-                    <p><span class="has-text-weight-bold">Description:</span> {{business_item.description}}</p>
-                    <p><span class="has-text-weight-bold">Price:</span> {{business_item.price / 100}} INR</p>
-                    <p><span class="has-text-weight-bold">Last Updated At:</span> {{business_item.updated_at}}</p>
+            <div class="column is-half">
+                <div class="box is-clickable">
+                    <h1 class="has-text-weight-semibold is-size-4 has-text-link-dark">{{business_item.name}}</h1>
+                    <p class="is-size-5">{{business_item.description}}</p>
+                    <p class="has-text-weight-semibold">{{business_item.price / 100}} INR</p>
+                    <br>
+                    <p class="is-size-6">Last Update At: {{business_item.updated_at}}</p>
                 </div>
             </div>
         {% endfor %}
