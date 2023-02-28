@@ -1,27 +1,34 @@
-<header class="navbar">
-  <div class="navbar-brand">
-    <a class="title navbar-item" href="{{url_for('home')}}">OTF</a>
-  </div>
-  <div class="navbar-end">
-    {% if navbar_type == 'home' %} 
-        <div class="navbar-item">
-            <a class="button is-link" href="{{url_for('auth.login', account_type='BUSINESS')}}">Business</a>
+<nav class="navbar">
+    <div class="navbar-brand">
+        <a class="title navbar-item" href="{{url_for('home')}}">OTF</a>
+        <span class="navbar-burger" data-target="navbar-burger-target">
+            <span></span>
+            <span></span>
+            <span></span>
+        </span>
+    </div>
+    <div class="navbar-menu" id="navbar-burger-target">
+        <div class="navbar-end">
+            {% if navbar_type == 'home' %} 
+                <div class="navbar-item">
+                    <a class="button is-link" href="{{url_for('auth.login', account_type='BUSINESS')}}">Business</a>
+                </div>
+                <div class="navbar-item">
+                    <a class="button is-link" href="{{url_for('auth.login', account_type='CUSTOMER')}}">Customer</a>
+                </div>
+            {% elif navbar_type == 'user' %}
+                <div class="navbar-item">
+                    <a class="button is-link" href="{{url_for('auth.logout')}}">Logout</a>
+                </div>
+            {% elif navbar_type == 'business_items' %}
+                <div class="navbar-item">
+                    <a class="button is-link" href="{{url_for('business.create_business_item')}}">Create Item</a>
+                </div>
+            {% else %} 
+                <div class="navbar-item">
+                    <a class="button is-link" href="{{url_for('home')}}">Home</a>
+                </div>
+            {% endif %}
         </div>
-        <div class="navbar-item">
-            <a class="button is-link" href="{{url_for('auth.login', account_type='CUSTOMER')}}">Customer</a>
-        </div>
-    {% elif navbar_type == 'user' %}
-        <div class="navbar-item">
-            <a class="button is-link" href="{{url_for('auth.logout')}}">Logout</a>
-        </div>
-    {% elif navbar_type == 'business_items' %}
-        <div class="navbar-item">
-            <a class="button is-link" href="{{url_for('business.create_business_item')}}">Create Item</a>
-        </div>
-    {% else %} 
-        <div class="navbar-item">
-            <a class="button is-link" href="{{url_for('home')}}">Home</a>
-        </div>
-    {% endif %}
-  </div>
-</header>
+    </div>
+</nav>

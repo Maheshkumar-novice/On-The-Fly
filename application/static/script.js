@@ -66,4 +66,14 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     })
   });
+
+  (document.querySelectorAll(".navbar-burger") || []).forEach(($burger) => {
+    $burger.addEventListener("click", () => {
+      const target = $burger.dataset.target;
+      const $target = document.getElementById(target);
+
+      $burger.classList.toggle("is-active");
+      $target.classList.toggle("is-active");
+    })
+  });
 });
