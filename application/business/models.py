@@ -75,4 +75,4 @@ class BusinessItem(db.Model, SerializerMixin):
                         default=datetime.now, onupdate=datetime.now)
     user = relationship('User', back_populates='business_items')
 
-    serialize_only = ('name', 'description', 'created_at', 'updated_at')
+    serialize_only = ('name', 'description', 'price', 'updated_at')

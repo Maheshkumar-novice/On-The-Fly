@@ -92,7 +92,9 @@ def business_subtypes():
 
 @login_required
 def business_items():
-    return render_template('business_items.html', navbar_type='business_items', user_type='business')
+    business_items = [business_item.to_dict() for business_item in BusinessItem.query.filter_by(
+        user_id=current_user.id, is_available=True).all()]
+    return render_template('business_items.html', navbar_type='business_items', user_type='business', business_items=business_items)
 
 
 @login_required
@@ -104,7 +106,7 @@ def create_business_item():
             'user_id': current_user.id,
             'name': form.name.data,
             'description': form.description.data,
-            'price': form.price.data,
+            'price': form.price.data * 100,
             'is_available': form.is_available.data
         }
         business_item = BusinessItem(**data)

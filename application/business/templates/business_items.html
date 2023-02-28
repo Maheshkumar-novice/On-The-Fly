@@ -5,4 +5,19 @@
   {% include "_flash.html" %}
 
   {% include "_common_navbar.html" %}
+
+  <div class="section">
+    <div class="columns is-multiline">
+        {% for business_item in business_items %} 
+            <div class="column is-narrow">
+                <div class="box p-3">
+                    <h1 class="title">{{business_item.name}}</h1>
+                    <p><span class="has-text-weight-bold">Description:</span> {{business_item.description}}</p>
+                    <p><span class="has-text-weight-bold">Price:</span> {{business_item.price / 100}} INR</p>
+                    <p><span class="has-text-weight-bold">Last Updated At:</span> {{business_item.updated_at}}</p>
+                </div>
+            </div>
+        {% endfor %}
+      </div>
+  </div>
 {% endblock %}
