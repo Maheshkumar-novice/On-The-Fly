@@ -14,6 +14,10 @@
         <div class="navbar-item">
             <a class="button is-link" href="{{url_for('auth.logout')}}">Logout</a>
         </div>
+    {% elif navbar_type == 'business_items' %}
+        <div class="navbar-item">
+            <a class="button is-link" href="{{url_for('business.create_business_item')}}">Create Item</a>
+        </div>
     {% else %} 
         <div class="navbar-item">
             <a class="button is-link" href="{{url_for('home')}}">Home</a>

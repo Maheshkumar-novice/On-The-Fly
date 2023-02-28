@@ -20,3 +20,13 @@ business_buleprint.add_url_rule(rule='/subtypes',
                                 view_func=business_subtypes,
                                 endpoint='business_subtypes',
                                 methods=['GET'])
+
+business_buleprint.add_url_rule(rule='/items',
+                                view_func=business_items,
+                                endpoint='business_items',
+                                methods=['GET'])
+
+business_buleprint.add_url_rule(rule='/create_item',
+                                view_func=create_business_item,
+                                endpoint='create_business_item',
+                                methods=['GET', 'POST'])

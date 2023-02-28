@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
       minutes = Math.floor(total_seconds / 60);
       seconds = Math.floor(total_seconds % 60);
 
-      const finalTime = `${strPadLeft(minutes, '0', 2)} : ${strPadLeft(seconds, '0', 2)}`;
+      const finalTime = `${strPadLeft(minutes, "0", 2)} : ${strPadLeft(seconds, "0", 2)}`;
       $flash.textContent = `You can try again in ${finalTime}.`
 
       total_seconds -= 1;
@@ -54,12 +54,12 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   
   const $businessSubTypeSelectElement = document.querySelector("select#business_subtype");
-  document.querySelector("select#business_type").addEventListener("change", (e) => {
+  document.querySelector("select#business_type")?.addEventListener("change", (e) => {
     $businessSubTypeSelectElement.innerHTML = '';
 
     getBusinessSubTypes(e.target.value).then(businessSubTypes => {
       for (let businessSubType of businessSubTypes) {
-        let $optionElement = document.createElement('option');
+        let $optionElement = document.createElement("option");
         $optionElement.innerText = businessSubType;
         $optionElement.setAttribute("value", businessSubType);
         $businessSubTypeSelectElement.appendChild($optionElement);

@@ -3,9 +3,10 @@ from flask_login import current_user, login_required
 from sqlalchemy import select
 
 from application import db
-from application.business.forms import BusinessHomePageEditForm
-from application.business.models import (BusinessInformation, BusinessSubType,
-                                         BusinessType)
+from application.business.forms import (BusinessHomePageEditForm,
+                                        BusinessItemForm)
+from application.business.models import (BusinessInformation, BusinessItem,
+                                         BusinessSubType, BusinessType)
 
 
 @login_required
@@ -87,3 +88,28 @@ def business_subtypes():
         return [business_subtype.to_dict()['name'] for business_subtype in business_type.business_subtypes]
 
     return []
+
+
+@login_required
+def business_items():
+    return render_template('business_items.html', navbar_type='business_items', user_type='business')
+
+
+@login_required
+def create_business_item():
+    form = BusinessItemForm()
+
+    if form.validate_on_submit():
+        data = {
+            'user_id': current_user.id,
+            'name': form.name.data,
+            'description': form.description.data,
+            'price': form.price.data,
+            'is_available': form.is_available.data
+        }
+        business_item = BusinessItem(**data)
+        db.session.add(business_item)
+        db.session.commit()
+        return redirect(url_for('business.business_items'))
+
+    return render_template('create_business_item.html', navbar_type='user', user_type='business', form=form)

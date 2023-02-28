@@ -1,8 +1,11 @@
+from flask_login import current_user
 from flask_wtf import FlaskForm
-from wtforms import SelectField, StringField, TextAreaField
+from wtforms import (BooleanField, FloatField, SelectField, StringField,
+                     TextAreaField)
 from wtforms.validators import Length, ValidationError
 
-from application.business.models import BusinessSubType, BusinessType
+from application.business.models import (BusinessItem, BusinessSubType,
+                                         BusinessType)
 
 
 class BusinessHomePageEditForm(FlaskForm):
@@ -22,3 +25,16 @@ class BusinessHomePageEditForm(FlaskForm):
         if business_type_id_from_chosen_subtype != business_type_id_from_input:
             raise ValidationError(
                 'Please choose the correct business type for this subtype.')
+
+
+class BusinessItemForm(FlaskForm):
+    name = StringField('Name', validators=[
+                       Length(min=1, max=100)], description='Name')
+    description = TextAreaField('Description', validators=[
+                                Length(min=1, max=200)], description='Description')
+    price = FloatField('Price', description='Price')
+    is_available = BooleanField('Is Available', description='Is Available')
+
+    def validate_name(self, name):
+        if BusinessItem.query.filter_by(name=name.data, user_id=current_user.id).scalar():
+            raise ValidationError('Business Item already exists')

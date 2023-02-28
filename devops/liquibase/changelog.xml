@@ -209,4 +209,28 @@
             ('Rental House Service', 2);
         </sql>
     </changeSet>
+    <changeSet id="22" author="Maheshkumar">
+        <sql>
+            CREATE TABLE public.business_items (
+                id bigserial NOT NULL,
+                user_id bigint NOT NULL,
+                name varchar(100) NOT NULL,
+                description varchar(200) NOT NULL,
+                created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                CONSTRAINT pk_business_items PRIMARY KEY (id),
+                CONSTRAINT fk_business_items_user_id FOREIGN KEY (user_id) REFERENCES public.users(id)
+            );
+        </sql>
+    </changeSet>
+    <changeSet id="23" author="Maheshkumar">
+        <sql>
+            ALTER TABLE public.business_items
+            ADD COLUMN price bigint NOT NULL DEFAULT 0;
+        </sql>
+        <sql>
+            ALTER TABLE public.business_items
+            ADD COLUMN is_available boolean NOT NULL DEFAULT false;
+        </sql>
+    </changeSet>
 </databaseChangeLog>
