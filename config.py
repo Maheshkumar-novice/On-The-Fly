@@ -5,8 +5,6 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-basedir = os.path.abspath(os.path.dirname(__file__))
-
 APP_SETTINGS = os.getenv('APP_SETTINGS', 'config.DevelopmentConfig')
 
 
