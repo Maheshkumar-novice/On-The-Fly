@@ -151,7 +151,7 @@ def edit_business_item():
         db.session.add(business_item)
         db.session.commit()
         return redirect(url_for('business.business_items'))
-    
+
     form.name.default = business_item.name
     form.description.default = business_item.description
     form.price.default = business_item.price
@@ -160,3 +160,21 @@ def edit_business_item():
     form.process()
 
     return render_template('edit_business_item.html', navbar_type='user', user_type='business', business_item=business_item, form=form)
+
+
+@login_required
+def delete_business_item():
+    try:
+        id = int(request.args.get('id'))
+    except Exception:
+        id = None
+
+    if id:
+        business_item = BusinessItem.query.filter_by(id=id).scalar()
+        if business_item:
+            db.session.delete(business_item)
+            db.session.commit()
+
+        return {'id': id}
+
+    return {'id': -1}, 404

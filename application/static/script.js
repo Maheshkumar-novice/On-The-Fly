@@ -81,5 +81,21 @@ document.addEventListener("DOMContentLoaded", () => {
     $businessItem.addEventListener("click", (e) => {
       window.location.href = `/business/edit_item?id=${$businessItem.dataset.id}`;
     })
-  })
+  });
+
+  (document.querySelectorAll(".business-item-delete") || []).forEach(($businessItemDelete) => {
+    $businessItemDelete.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      $deletionTarget = e.target.closest('.business-item');
+      
+      const confirmation = confirm('Are you sure want to delete this item?');
+
+      if (confirmation) {
+        response = await fetch(`/business/delete_item?id=${$deletionTarget.dataset.id}`, { method: 'DELETE' });
+        await response.json().then(() => {
+          window.location.href = '/business/items';
+        });
+      }
+    })
+  });
 });

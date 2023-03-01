@@ -35,3 +35,8 @@ business_buleprint.add_url_rule(rule='/edit_item',
                                 view_func=edit_business_item,
                                 endpoint='edit_business_item',
                                 methods=['GET', 'POST'])
+
+business_buleprint.add_url_rule(rule='/delete_item',
+                                view_func=delete_business_item,
+                                endpoint='delete_business_item',
+                                methods=['DELETE'])

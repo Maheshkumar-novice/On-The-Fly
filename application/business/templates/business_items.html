@@ -33,7 +33,12 @@
         {% for business_item in business_items %} 
             <div class="column is-half">
                 <div class="box is-clickable business-item" data-id="{{business_item.id}}">
-                    <h1 class="has-text-weight-semibold is-size-4 has-text-link-dark">{{business_item.name}}</h1>
+                    <div class="block is-flex m-0 is-justify-content-space-between	">
+                      <h1 class="has-text-weight-semibold is-size-4 has-text-link-dark">{{business_item.name}}</h1>
+                      <span class="icon is-clickable business-item-delete">
+                        <i class="fas fa-trash"></i>
+                      </span>
+                    </div>
                     <p class="is-size-5">{{business_item.description}}</p>
                     <p class="has-text-weight-semibold">{{business_item.price / 100}} INR</p>
                     <br>
