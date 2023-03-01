@@ -101,10 +101,10 @@ def business_items():
     search_term = request.args.get('search')
     if search_term:
         business_items = [business_item.to_dict() for business_item in BusinessItem.query.filter(
-            BusinessItem.user_id == current_user.id, BusinessItem.is_available == True, BusinessItem.name.ilike(f'%{search_term}%')).all()]
+            BusinessItem.user_id == current_user.id, BusinessItem.name.ilike(f'%{search_term}%')).all()]
     else:
         business_items = [business_item.to_dict() for business_item in BusinessItem.query.filter_by(
-            user_id=current_user.id, is_available=True).all()]
+            user_id=current_user.id).all()]
 
     return render_template('business_items.html', navbar_type='business_items', user_type='business', business_items=business_items, form=form)
 
@@ -141,7 +141,7 @@ def edit_business_item():
     else:
         return redirect(url_for('business.business_items'))
 
-    form = BusinessItemEditForm()
+    form = BusinessItemEditForm(id=id)
 
     if form.validate_on_submit():
         business_item.name = form.name.data

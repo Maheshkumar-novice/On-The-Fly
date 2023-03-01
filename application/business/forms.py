@@ -46,4 +46,13 @@ class BusinessItemSearchForm(FlaskForm):
 
 
 class BusinessItemEditForm(BusinessItemForm):
-    pass
+    def __init__(self, id):
+        self.id = id
+        super().__init__()
+
+    def validate_name(self, name):
+        name = name.data
+        business_item = BusinessItem.query.filter_by(
+            name=name, user_id=current_user.id).filter(BusinessItem.id != self.id).scalar()
+        if business_item:
+            raise ValidationError('Business Item already exists')

@@ -41,6 +41,11 @@
                     </div>
                     <p class="is-size-5">{{business_item.description}}</p>
                     <p class="has-text-weight-semibold">{{business_item.price / 100}} INR</p>
+                    {% if business_item.is_available %} 
+                      <p class="has-text-success">Available</p>
+                    {% else %} 
+                      <p class="has-text-danger">Unavailable</p>
+                    {% endif %}
                     <br>
                     <p class="is-size-6">Last Update At: {{business_item.updated_at}}</p>
                 </div>
