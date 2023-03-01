@@ -38,3 +38,8 @@ class BusinessItemForm(FlaskForm):
     def validate_name(self, name):
         if BusinessItem.query.filter_by(name=name.data, user_id=current_user.id).scalar():
             raise ValidationError('Business Item already exists')
+
+
+class BusinessItemSearchForm(FlaskForm):
+    search_term = StringField('Search Term', validators=[
+                              Length(min=0, max=50)], description='Search Term')

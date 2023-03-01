@@ -4,7 +4,7 @@ from sqlalchemy import select
 
 from application import db
 from application.business.forms import (BusinessHomePageEditForm,
-                                        BusinessItemForm)
+                                        BusinessItemForm, BusinessItemSearchForm)
 from application.business.models import (BusinessInformation, BusinessItem,
                                          BusinessSubType, BusinessType)
 
@@ -92,9 +92,21 @@ def business_subtypes():
 
 @login_required
 def business_items():
-    business_items = [business_item.to_dict() for business_item in BusinessItem.query.filter_by(
-        user_id=current_user.id, is_available=True).all()]
-    return render_template('business_items.html', navbar_type='business_items', user_type='business', business_items=business_items)
+    form = BusinessItemSearchForm()
+
+    if form.validate_on_submit():
+        search_term = form.search_term.data
+        return redirect(url_for('business.business_items', search=search_term))
+
+    search_term = request.args.get('search')
+    if search_term:
+        business_items = [business_item.to_dict() for business_item in BusinessItem.query.filter(
+            BusinessItem.user_id == current_user.id, BusinessItem.is_available == True, BusinessItem.name.ilike(f'%{search_term}%')).all()]
+    else:
+        business_items = [business_item.to_dict() for business_item in BusinessItem.query.filter_by(
+            user_id=current_user.id, is_available=True).all()]
+
+    return render_template('business_items.html', navbar_type='business_items', user_type='business', business_items=business_items, form=form)
 
 
 @login_required
