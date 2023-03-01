@@ -4,7 +4,7 @@ from sqlalchemy import select
 
 from application import db
 from application.business.forms import (BusinessHomePageEditForm,
-                                        BusinessItemForm, BusinessItemSearchForm)
+                                        BusinessItemForm, BusinessItemSearchForm, BusinessItemEditForm)
 from application.business.models import (BusinessInformation, BusinessItem,
                                          BusinessSubType, BusinessType)
 
@@ -127,3 +127,36 @@ def create_business_item():
         return redirect(url_for('business.business_items'))
 
     return render_template('create_business_item.html', navbar_type='user', user_type='business', form=form)
+
+
+@login_required
+def edit_business_item():
+    try:
+        id = int(request.args.get('id'))
+    except Exception:
+        id = None
+
+    if id:
+        business_item = BusinessItem.query.filter_by(id=id).scalar()
+    else:
+        return redirect(url_for('business.business_items'))
+
+    form = BusinessItemEditForm()
+
+    if form.validate_on_submit():
+        business_item.name = form.name.data
+        business_item.description = form.description.data
+        business_item.price = form.price.data
+        business_item.is_available = form.is_available.data
+        db.session.add(business_item)
+        db.session.commit()
+        return redirect(url_for('business.business_items'))
+    
+    form.name.default = business_item.name
+    form.description.default = business_item.description
+    form.price.default = business_item.price
+    form.is_available.default = business_item.is_available
+
+    form.process()
+
+    return render_template('edit_business_item.html', navbar_type='user', user_type='business', business_item=business_item, form=form)

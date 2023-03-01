@@ -43,3 +43,7 @@ class BusinessItemForm(FlaskForm):
 class BusinessItemSearchForm(FlaskForm):
     search_term = StringField('Search Term', validators=[
                               Length(min=0, max=50)], description='Search Term')
+
+
+class BusinessItemEditForm(BusinessItemForm):
+    pass

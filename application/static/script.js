@@ -76,4 +76,10 @@ document.addEventListener("DOMContentLoaded", () => {
       $target.classList.toggle("is-active");
     })
   });
+
+  (document.querySelectorAll(".business-item") || []).forEach(($businessItem) => {
+    $businessItem.addEventListener("click", (e) => {
+      window.location.href = `/business/edit_item?id=${$businessItem.dataset.id}`;
+    })
+  })
 });

@@ -1,0 +1,18 @@
+{% set action_url = url_for('business.edit_business_item', id=business_item.id) %}
+{% set button_value = 'Save' %}
+{% set legend = 'Edit Business Item' %}
+
+{% extends "base.html" %} 
+{% import "macros.html" as macros %}
+
+{% block content %}
+  {% include "_flash.html" %}
+
+  {% include "_common_navbar.html" %}
+
+  <div class="container">
+    {{macros.render_generic_form(form, action_url, legend, button_value)}}
+  </div>
+{% endblock %}
+
+

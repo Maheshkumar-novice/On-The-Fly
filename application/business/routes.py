@@ -30,3 +30,8 @@ business_buleprint.add_url_rule(rule='/create_item',
                                 view_func=create_business_item,
                                 endpoint='create_business_item',
                                 methods=['GET', 'POST'])
+
+business_buleprint.add_url_rule(rule='/edit_item',
+                                view_func=edit_business_item,
+                                endpoint='edit_business_item',
+                                methods=['GET', 'POST'])
