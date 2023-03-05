@@ -106,6 +106,9 @@ def business_items():
         business_items = [business_item.to_dict() for business_item in BusinessItem.query.filter_by(
             user_id=current_user.id).all()]
 
+    form.search_term.default = search_term
+    form.process()
+
     return render_template('business_items.html', navbar_type='business_items', user_type='business', business_items=business_items, form=form)
 
 
@@ -146,7 +149,8 @@ def edit_business_item():
     if form.validate_on_submit():
         business_item.name = form.name.data
         business_item.description = form.description.data
-        business_item.price = BusinessItem.convert_price_to_paisas(form.price.data)
+        business_item.price = BusinessItem.convert_price_to_paisas(
+            form.price.data)
         business_item.is_available = form.is_available.data
         db.session.add(business_item)
         db.session.commit()
@@ -154,7 +158,8 @@ def edit_business_item():
 
     form.name.default = business_item.name
     form.description.default = business_item.description
-    form.price.default = BusinessItem.convert_price_to_rupees(business_item.price)
+    form.price.default = BusinessItem.convert_price_to_rupees(
+        business_item.price)
     form.is_available.default = business_item.is_available
 
     form.process()
