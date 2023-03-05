@@ -76,3 +76,11 @@ class BusinessItem(db.Model, SerializerMixin):
     user = relationship('User', back_populates='business_items')
 
     serialize_only = ('id', 'name', 'description', 'price', 'is_available', 'updated_at')
+
+    @staticmethod
+    def convert_price_to_paisas(price):
+        return price * 100
+    
+    @staticmethod
+    def convert_price_to_rupees(price):
+        return price / 100

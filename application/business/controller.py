@@ -118,7 +118,7 @@ def create_business_item():
             'user_id': current_user.id,
             'name': form.name.data,
             'description': form.description.data,
-            'price': form.price.data * 100,
+            'price': BusinessItem.convert_price_to_paisas(form.price.data),
             'is_available': form.is_available.data
         }
         business_item = BusinessItem(**data)
@@ -146,7 +146,7 @@ def edit_business_item():
     if form.validate_on_submit():
         business_item.name = form.name.data
         business_item.description = form.description.data
-        business_item.price = form.price.data
+        business_item.price = BusinessItem.convert_price_to_paisas(form.price.data)
         business_item.is_available = form.is_available.data
         db.session.add(business_item)
         db.session.commit()
@@ -154,7 +154,7 @@ def edit_business_item():
 
     form.name.default = business_item.name
     form.description.default = business_item.description
-    form.price.default = business_item.price
+    form.price.default = BusinessItem.convert_price_to_rupees(business_item.price)
     form.is_available.default = business_item.is_available
 
     form.process()
