@@ -204,7 +204,7 @@ def totp_verification():
             db.session.add(current_user)
             db.session.commit()
         flash('Login Success.', category='info')
-    return redirect(url_for('auth.user_home'))
+        return redirect(url_for('auth.user_home'))
 
     return render_template('verification.html', form=form, template_type='totp')
 
@@ -272,6 +272,7 @@ def password_reset(token):
 def logout():
     session.clear()
     logout_user()
+    flash('User Logged out.', category='info')
     return redirect(url_for('home'))
 
 
