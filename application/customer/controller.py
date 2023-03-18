@@ -1,4 +1,5 @@
 from flask import redirect, render_template, request, url_for
+from flask_login import login_required
 from sqlalchemy import select
 
 from application import db
@@ -7,10 +8,12 @@ from application.business.models import BusinessInformation
 from application.customer.forms import BusinessSearchForm
 
 
+@login_required
 def home():
     return redirect(url_for('customer.feed'))
 
 
+@login_required
 def feed():
     form = BusinessSearchForm()
 
