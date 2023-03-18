@@ -3,6 +3,7 @@ from flask_login import current_user, login_required
 from sqlalchemy import select
 
 from application import db
+from application.auth.models import User
 from application.business.forms import (BusinessHomePageEditForm,
                                         BusinessItemEditForm, BusinessItemForm,
                                         BusinessItemSearchForm)
@@ -184,3 +185,38 @@ def delete_business_item():
         return {'id': id}
 
     return {'id': -1}, 404
+
+
+@login_required
+def view(id):
+    query = select(User, BusinessInformation) \
+        .join(BusinessInformation) \
+        .filter(User.id == id,
+                User.role_id == 1,
+                BusinessInformation.user_id == User.id)
+    data = [{**business.to_dict(), **business_information.to_dict()}
+            for business, business_information in db.session.execute(query).all()][0]
+
+    return render_template('business_view.html', navbar_type='user', user_type='customer', business_data=data)
+
+
+@login_required
+def business_items_view(id):
+    form = BusinessItemSearchForm()
+
+    if form.validate_on_submit():
+        search_term = form.search_term.data
+        return redirect(url_for('business.business_items_view', id=id, search=search_term))
+
+    search_term = request.args.get('search')
+    if search_term:
+        business_items = [business_item.to_dict() for business_item in BusinessItem.query.filter(
+            BusinessItem.user_id == id, BusinessItem.name.ilike(f'%{search_term}%')).all()]
+    else:
+        business_items = [business_item.to_dict() for business_item in BusinessItem.query.filter_by(
+            user_id=id).all()]
+
+    form.search_term.default = search_term
+    form.process()
+
+    return render_template('business_items_view.html', navbar_type='user', user_type='customer', business_items=business_items, form=form, id=id)

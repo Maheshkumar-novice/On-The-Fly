@@ -1,0 +1,48 @@
+{% extends "base.html" %} 
+
+{% block content %}
+    {% include "_flash.html" %}
+
+    {% include "_common_navbar.html" %}
+
+    <div class="columns">
+        <div class="column is-half is-offset-one-quarter">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-header-title is-centered is-capitalized is-size-4">{{business_data.name}}</h2>
+                </div>
+                <div class="card-content">
+                    <div class="content">
+                        <h2 class="is-size-5">Description</h2>
+                        <p>{{business_data.description}}</p>
+                    </div>
+                    <hr>
+                    <div class="content">
+                        <h2 class="is-size-5">GST No</h2>
+                        <p>{{business_data.gst_no}}</p>
+                    </div>
+                    <hr>
+                    <div class="content">
+                        <h2 class="is-size-5">Contact</h2>
+                        <p><strong>Email:</strong> {{business_data.email}}</p>
+                        <p><strong>Mobile No:</strong> {{business_data.mobile_no}}</p>
+                    </div>
+                    <hr>
+                    <div class="content">
+                        <h2 class="is-size-5">Business Type</h2>
+                        {% if business_data.business_subtype %} 
+                            <p>{{business_data.business_subtype.name}}, <strong>subtype of</strong> {{business_data.business_subtype.business_type.name}}</p>
+                        {% else %}
+                            <p>None</p>
+                        {% endif %}
+                    </div>
+                    <hr>
+                    <div class="content">
+                        <h2 class="is-size-5">Business Items</h2>
+                        <a class="button is-link" href="{{url_for('business.business_items_view', id=business_data.id)}}">View</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

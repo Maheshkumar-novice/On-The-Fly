@@ -38,7 +38,7 @@ class User(db.Model, UserMixin, SerializerMixin):
         'BusinessInformation', cascade='all, delete', primaryjoin='and_(User.id==BusinessInformation.user_id, User.role_id==1)', uselist=False)
     business_items = relationship('BusinessItem', cascade='all, delete', primaryjoin='and_(User.id==BusinessItem.user_id, User.role_id==1)')
 
-    serialize_only = ('name', 'email', 'mobile_no',
+    serialize_only = ('id', 'name', 'email', 'mobile_no',
                       'is_email_verified', 'is_mobile_verified', 'is_totp_enabled')
 
     def set_password(self, password):

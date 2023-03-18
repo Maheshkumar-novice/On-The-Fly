@@ -98,4 +98,10 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     })
   });
+
+  (document.querySelectorAll(".business") || []).forEach(($business) => {
+    $business.addEventListener("click", (e) => {
+      window.location.href = `/business/view/${$business.dataset.id}`;
+    })
+  });
 });
