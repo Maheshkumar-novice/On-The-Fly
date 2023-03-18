@@ -283,4 +283,4 @@ def user_home():
     if user_role.role_name == BUSINESS_ROLE:
         return redirect(url_for('business.home'))
 
-    return redirect(url_for('home'))
+    return redirect(url_for('customer.home'))

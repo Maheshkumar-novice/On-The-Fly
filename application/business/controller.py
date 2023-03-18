@@ -4,7 +4,8 @@ from sqlalchemy import select
 
 from application import db
 from application.business.forms import (BusinessHomePageEditForm,
-                                        BusinessItemForm, BusinessItemSearchForm, BusinessItemEditForm)
+                                        BusinessItemEditForm, BusinessItemForm,
+                                        BusinessItemSearchForm)
 from application.business.models import (BusinessInformation, BusinessItem,
                                          BusinessSubType, BusinessType)
 

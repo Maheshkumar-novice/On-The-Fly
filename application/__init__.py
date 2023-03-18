@@ -25,8 +25,10 @@ def create_app():
 
     from application.auth.routes import auth_blueprint
     from application.business.routes import business_buleprint
+    from application.customer.routes import customer_blueprint
     app.register_blueprint(auth_blueprint, url_prefix='/auth')
     app.register_blueprint(business_buleprint, url_prefix='/business')
+    app.register_blueprint(customer_blueprint, url_prefix='/customer')
 
     from application.auth.models import User
 

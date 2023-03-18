@@ -1,0 +1,52 @@
+{% extends "base.html" %} 
+{% import "macros.html" as macros %}
+
+{% block content %}
+  {% include "_flash.html" %}
+
+  {% include "_common_navbar.html" %}
+
+  <div class="section">
+    <form action="{{url_for('customer.feed')}}" method="POST">
+      {% for field in form %} 
+        <div class="field">
+          <div class="control has-icons-left">
+            {{field(placeholder=field.description, class='input')}}
+            {% if field.type.lower() != 'csrftokenfield' %} 
+              <span class="icon is-small is-left">
+                <i class="fas fa-search"></i>
+              </span>
+            {% endif %}
+          </div>
+          {% if field.errors %} 
+            {% for error in field.errors %} 
+              <p class="help is-danger">
+                {{error}}
+              </p>
+            {% endfor %} 
+          {% endif %}
+        </div>
+      {% endfor %}
+    </form>
+  
+    <div class="columns is-multiline">
+        {% for business in businesses %} 
+            <div class="column is-half">
+                <div class="box is-clickable business">
+                    <div class="block is-flex m-0 is-justify-content-space-between">
+                      <h1 class="has-text-weight-semibold is-size-4 has-text-link-dark">{{business.name}}</h1>
+                    </div>
+                    <p class="is-size-5">{{business.description}}</p>
+                    {% if business.business_subtype %} 
+                    <p class="is-size-6">{{business.business_subtype.name}} - {{business.business_subtype.business_type.name}} Type</p>
+                    {% endif %}
+                    <br>
+                    <p class="is-size-6">{{business.email}}</p>
+                    <p class="is-size-6">{{business.mobile_no}}</p>
+                    <p class="is-size-6">GST: {{business.gst_no}}</p>
+                </div>
+            </div>
+        {% endfor %}
+      </div>
+  </div>
+{% endblock %}

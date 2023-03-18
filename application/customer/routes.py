@@ -10,3 +10,8 @@ customer_blueprint.add_url_rule(rule='/home',
                                 view_func=home,
                                 endpoint='home',
                                 methods=['GET'])
+
+customer_blueprint.add_url_rule(rule='/feed',
+                                view_func=feed,
+                                endpoint='feed',
+                                methods=['GET', 'POST'])
