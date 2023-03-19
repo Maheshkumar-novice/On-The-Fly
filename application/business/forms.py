@@ -56,3 +56,13 @@ class BusinessItemEditForm(BusinessItemForm):
             name=name, user_id=current_user.id).filter(BusinessItem.id != self.id).scalar()
         if business_item:
             raise ValidationError('Business Item already exists')
+
+
+class BusinessTicketForm(FlaskForm):
+    is_business_item = BooleanField(
+        'Is Business Item', description='Is Business Item')
+    name = StringField('Name', validators=[
+                       Length(min=1, max=100)], description='Name')
+    business_items = SelectField('Business Items', choices=[])
+    requirement = StringField('Requirement (kg/days/nos)', validators=[
+        Length(min=1, max=50)], description='Requirement (kg/days/nos)')

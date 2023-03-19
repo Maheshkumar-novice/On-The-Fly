@@ -1,0 +1,41 @@
+{% set action_url = '#' %}
+{% set button_value = 'Add' %}
+{% set legend = 'Add Ticket Item' %}
+
+{% extends "base.html" %} 
+{% import "macros.html" as macros %}
+
+{% block content %}
+  {% include "_flash.html" %}
+
+  {% include "_common_navbar.html" %}
+
+  <div class="section">
+    <div class="columns">
+        <div class="column is-one-third">
+            <form action={{action_url}} method="POST" class="box ticket-item-form" data-business-id="{{business_id}}">
+                <fieldset>
+                    <legend class="title is-4">{{legend}}</legend>
+                    {{macros.form_fields(form)}}                    
+
+                    <div class="field">
+                        <div class="control">
+                            <button type="submit" class="button is-link">{{button_value}}</button>
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+        <div class="column is-one-third is-offset-one-quarter">
+            <div class="box ticket-items">
+                <div class="block is-flex is-justify-content-space-between">
+                    <h2 class="title is-5">Ticket Items</h2>
+                    <button class="button is-link create-ticket">Create Ticket</button>
+                </div>
+            </div>
+        </div>
+    </div>
+  </div>
+{% endblock %}
+
+

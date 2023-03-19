@@ -24,6 +24,10 @@
                 <div class="navbar-item">
                     <a class="button is-link" href="{{url_for('business.create_business_item')}}">Create Item</a>
                 </div>
+            {% elif navbar_type == 'business_items_view' %}
+                <div class="navbar-item">
+                    <a class="button is-link" href="{{url_for('business.ticket', business_id=id)}}">Create Ticket</a>
+                </div>
             {% else %} 
                 <div class="navbar-item">
                     <a class="button is-link" href="{{url_for('home')}}">Home</a>

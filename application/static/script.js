@@ -64,7 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
         $optionElement.setAttribute("value", businessSubType);
         $businessSubTypeSelectElement.appendChild($optionElement);
       }
-    })
+    });
   });
 
   (document.querySelectorAll(".navbar-burger") || []).forEach(($burger) => {
@@ -103,5 +103,121 @@ document.addEventListener("DOMContentLoaded", () => {
     $business.addEventListener("click", (e) => {
       window.location.href = `/business/view/${$business.dataset.id}`;
     })
+  });
+
+  const getBusinessItems = async (businessId) => {
+    let response = await fetch(`/business/items/${businessId}`);
+    return await response.json();
+  }
+
+  document.querySelector(".ticket-item-form #is_business_item")?.addEventListener("change", (e) => {
+    $form = e.target.closest('form');
+    
+    if (e.target.checked) {
+      $nameSelectInput = document.querySelector('select');
+      $nameSelectInput.textContent = '';
+
+      getBusinessItems($form.dataset.businessId).then(businessItems => {
+        for (let businessItem of businessItems) {
+          let $optionElement = document.createElement("option");
+          $optionElement.innerText = businessItem;
+          $optionElement.setAttribute("value", businessItem);
+          $nameSelectInput.appendChild($optionElement);
+        }
+      });
+
+      $nameInput = document.getElementById('name').closest('.field').setAttribute('hidden', true);
+      $nameInput = document.getElementById('name').setAttribute('disabled', true);
+      $nameSelectInput.closest('.field').removeAttribute('hidden');
+      $nameSelectInput.removeAttribute('disabled');
+    }
+    else {
+      $nameSelectInput = document.querySelector('select').closest('.field').setAttribute('hidden', true);
+      $nameSelectInput = document.querySelector('select').setAttribute('disabled', true);
+      $nameInput = document.querySelector('#name').closest('.field').removeAttribute('hidden');
+      $nameInput = document.querySelector('#name').removeAttribute('disabled');
+    }
+  }); 
+
+  document.querySelector(".ticket-item-form select")?.closest('.field').setAttribute('hidden', true);
+  document.querySelector(".ticket-item-form select")?.setAttribute('disabled', true);
+
+  document.querySelector('.ticket-item-form')?.addEventListener('submit', (e) => {
+    e.preventDefault()
+    const formData = new FormData(e.target);
+    const formProps = Object.fromEntries(formData);
+
+    let name;
+    if (formProps.is_business_item == 'y') {
+      name = formProps.business_items;
+    }
+    else {
+      name = formProps.name;
+    }
+
+    let requirement = formProps.requirement;
+
+
+    if (!name || !requirement) {
+      alert('Please enter all the details.');
+      return;
+    }
+    
+    $ticketItems = document.querySelector('.ticket-items');
+
+    $div = document.createElement('div');
+    $div.classList.add('ticket-item', 'level', 'm-1', 'p-2');
+
+    $nameParagraph = document.createElement('p');
+    $nameParagraph.classList.add('ticket-item-name');
+    $nameParagraph.textContent = name;
+
+    $requirementParagraph = document.createElement('p');
+    $requirementParagraph.classList.add('ticket-item-requirement');
+    $requirementParagraph.textContent = requirement;
+
+    $deleteIconContainer = document.createElement('div');
+    $deleteIconContainer.classList.add('ticket-item-delete');
+    $deleteIcon = document.createElement('i');
+    $deleteIcon.classList.add('fas', 'fa-trash', 'is-clickable');
+    $deleteIconContainer.appendChild($deleteIcon);
+    $deleteIconContainer.addEventListener('click', (e) => {
+      if (confirm('Are you sure want to delete this?')) {
+        e.target.closest('.ticket-item').remove();
+      }
+    });
+
+    $div.appendChild($nameParagraph);
+    $div.appendChild($requirementParagraph);
+    $div.appendChild($deleteIconContainer);
+
+    $ticketItems.appendChild($div);
+  });
+
+  document.querySelector('.create-ticket')?.addEventListener('click', async (e) => {
+    $ticketItems = e.target.parentElement.parentElement.querySelectorAll('.ticket-item');
+
+    let ticketItems = [];
+    for (let $ticketItem of $ticketItems) {
+      let name = $ticketItem.querySelector('.ticket-item-name').textContent;
+      let requirement = $ticketItem.querySelector('.ticket-item-requirement').textContent;
+      ticketItems.push({name: name, requirement: requirement})
+    }
+    console.log(JSON.stringify(ticketItems));
+
+    $form = document.querySelector('form');
+    response = await fetch(`/business/ticket?id=${$form.dataset.businessId}`, 
+                      { 
+                        method: 'POST',
+                        headers: {
+                          'Accept': 'application/json',
+                          'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(ticketItems)
+                      }
+                    );
+    await response.json().then(() => {
+        window.location.href = '/';
+    });
   });
 });

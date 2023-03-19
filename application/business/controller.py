@@ -4,11 +4,14 @@ from sqlalchemy import select
 
 from application import db
 from application.auth.models import User
+from application.business.constants import NEW
 from application.business.forms import (BusinessHomePageEditForm,
                                         BusinessItemEditForm, BusinessItemForm,
-                                        BusinessItemSearchForm)
+                                        BusinessItemSearchForm,
+                                        BusinessTicketForm)
 from application.business.models import (BusinessInformation, BusinessItem,
-                                         BusinessSubType, BusinessType)
+                                         BusinessSubType, BusinessType, Ticket,
+                                         TicketItem)
 
 
 @login_required
@@ -219,4 +222,42 @@ def business_items_view(id):
     form.search_term.default = search_term
     form.process()
 
-    return render_template('business_items_view.html', navbar_type='user', user_type='customer', business_items=business_items, form=form, id=id)
+    return render_template('business_items_view.html', navbar_type='business_items_view', user_type='customer', business_items=business_items, form=form, id=id)
+
+
+@login_required
+def ticket(business_id):
+    form = BusinessTicketForm()
+    return render_template('business_ticket.html', navbar_type='user', user_type='customer', form=form, business_id=business_id)
+
+
+@login_required
+def items_by_business_id(business_id):
+    return [business_item.name for business_item in BusinessItem.query.filter_by(user_id=business_id).all()]
+
+
+@login_required
+def create_ticket():
+    try:
+        business_id = int(request.args.get('id'))
+    except Exception:
+        return 'Business Not Found', 404
+
+    ticket = Ticket()
+    ticket.status = NEW
+    ticket.created_by = current_user.id
+    ticket.created_for = business_id
+    db.session.add(ticket)
+    db.session.commit()
+
+    payload = request.get_json()
+
+    for ticket_item_data in payload:
+        ticket_item = TicketItem()
+        ticket_item.item_name = ticket_item_data['name']
+        ticket_item.item_requirement = ticket_item_data['requirement']
+        ticket_item.ticket_id = ticket.id
+        db.session.add(ticket_item)
+        db.session.commit()
+
+    return {}, 200
