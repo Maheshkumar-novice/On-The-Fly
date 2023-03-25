@@ -41,12 +41,12 @@ business_buleprint.add_url_rule(rule='/delete_item',
                                 endpoint='delete_business_item',
                                 methods=['DELETE'])
 
-business_buleprint.add_url_rule(rule='/view/<int:id>', # business id
+business_buleprint.add_url_rule(rule='/view/<int:id>',  # business id
                                 view_func=view,
                                 endpoint='view',
                                 methods=['GET'])
 
-business_buleprint.add_url_rule(rule='/items_view/<int:id>', # business id
+business_buleprint.add_url_rule(rule='/items_view/<int:id>',  # business id
                                 view_func=business_items_view,
                                 endpoint='business_items_view',
                                 methods=['GET', 'POST'])
@@ -69,3 +69,14 @@ business_buleprint.add_url_rule(rule='/ticket',
                                 methods=['POST'])
 
 # https://stackoverflow.com/questions/30967822/when-do-i-use-path-params-vs-query-params-in-a-restful-api
+
+
+business_buleprint.add_url_rule(rule='/tickets',
+                                view_func=tickets,
+                                endpoint='tickets',
+                                methods=['GET'])
+
+business_buleprint.add_url_rule(rule='/tickets/<int:id>',
+                                view_func=ticket_by_id,
+                                endpoint='ticket_by_id',
+                                methods=['GET'])

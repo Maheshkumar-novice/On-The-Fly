@@ -226,4 +226,10 @@ document.addEventListener("DOMContentLoaded", () => {
       window.location.href = `/customer/tickets/${$ticket.dataset.id}`;
     })
   });
+
+  (document.querySelectorAll(".business-ticket") || []).forEach(($ticket) => {
+    $ticket.addEventListener("click", (e) => {
+      window.location.href = `/business/tickets/${$ticket.dataset.id}`;
+    })
+  });
 });

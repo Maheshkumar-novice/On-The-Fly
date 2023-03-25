@@ -1,0 +1,45 @@
+{% extends "base.html" %} 
+{% import "macros.html" as macros %}
+
+{% block content %}
+  {% include "_flash.html" %}
+
+  {% include "_common_navbar.html" %}
+
+  <div class="columns">
+    <div class="column is-half is-offset-one-quarter">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-header-title is-centered is-capitalized is-size-4">{{ticket.business.name}}#{{ticket.id}}</h2>
+            </div>
+            <div class="card-content">
+                <div class="content">
+                    <h2 class="is-size-5">Status</h2>
+                    <p>{{ticket.status}}</p>
+                </div>
+                <hr>
+                <div class="content">
+                    <h2 class="is-size-5">Created At</h2>
+                    <p>{{ticket.created_at}}</p>
+                </div>
+                <hr>
+                <div class="content">
+                    <h2 class="is-size-5">Updated At</h2>
+                    <p>{{ticket.updated_at}}</p>
+                </div>
+                <hr>
+                <div class="content">
+                    <h2 class="is-size-5">Ticket Items</h2>
+                    {% for ticket_item in ticket_items %} 
+                        <p>{{ticket_item.item_name}} - {{ticket_item.item_requirement}}</p>
+                    {% endfor %}
+                </div>
+                <hr>
+                <div class="content">
+                    <h2 class="is-size-5">Ticket Comments</h2>
+                </div>
+                <hr>
+        </div>
+    </div>
+</div>
+{% endblock %}

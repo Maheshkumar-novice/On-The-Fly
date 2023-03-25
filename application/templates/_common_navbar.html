@@ -21,7 +21,11 @@
                     <div class="navbar-item">
                         <a class="button is-link" href="{{url_for('customer.tickets')}}">Tickets</a>
                     </div>
-                {% endif %}
+                {% elif user_type == 'business' %} 
+                    <div class="navbar-item">
+                        <a class="button is-link" href="{{url_for('business.tickets')}}">Tickets</a>
+                    </div>
+                {% endif %} 
                 <div class="navbar-item"> 
                     <a class="button is-link" href="{{url_for('auth.logout')}}">Logout</a>
                 </div>

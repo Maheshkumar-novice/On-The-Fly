@@ -261,3 +261,24 @@ def create_ticket():
         db.session.commit()
 
     return {}, 200
+
+
+@login_required
+def tickets():
+    tickets = [ticket.to_dict() for ticket in Ticket.query.filter(
+        Ticket.created_for == current_user.id).all()]
+
+    return render_template('business_tickets.html', navbar_type='user', user_type='business', tickets=tickets)
+
+
+@login_required
+def ticket_by_id(id):
+    ticket = Ticket.query.filter(Ticket.id == id)
+
+    if ticket:
+        ticket = ticket.scalar().to_dict()
+        ticket_items = [ticket_item.to_dict() for ticket_item in TicketItem.query.filter(
+            TicketItem.ticket_id == id).all()]
+        return render_template('business_ticket_view.html', navbar_type='user', user_type='business', ticket=ticket, ticket_items=ticket_items)
+
+    return redirect(url_for('business.tickets'))

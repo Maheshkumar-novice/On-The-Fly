@@ -1,0 +1,26 @@
+{% extends "base.html" %} 
+{% import "macros.html" as macros %}
+
+{% block content %}
+  {% include "_flash.html" %}
+
+  {% include "_common_navbar.html" %}
+
+  <div class="columns is-multiline m-2">
+    {% for ticket in tickets %} 
+        <div class="column is-half">
+            <div class="box is-clickable business-ticket" data-id="{{ticket.id}}">
+                <div class="block is-flex m-0 is-justify-content-space-between	">
+                  <h1 class="has-text-weight-semibold is-size-4 has-text-link-dark">{{ticket.business.name}}#{{ticket.id}}</h1>
+                </div>
+                <p class="has-text-weight-semibold">{{ticket.status}}</p>
+                <br>
+                Created At: <p class="has-text-weight-semibold">{{ticket.created_at}}</p>
+                <br>
+                Updated At: <p class="has-text-weight-semibold">{{ticket.updated_at}}</p>
+            </div>
+        </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
