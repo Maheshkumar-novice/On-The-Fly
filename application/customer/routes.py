@@ -15,3 +15,13 @@ customer_blueprint.add_url_rule(rule='/feed',
                                 view_func=feed,
                                 endpoint='feed',
                                 methods=['GET', 'POST'])
+
+customer_blueprint.add_url_rule(rule='/tickets',
+                                view_func=tickets,
+                                endpoint='tickets',
+                                methods=['GET'])
+
+customer_blueprint.add_url_rule(rule='/tickets/<int:id>',
+                                view_func=ticket,
+                                endpoint='ticket',
+                                methods=['GET'])

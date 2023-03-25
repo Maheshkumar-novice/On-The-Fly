@@ -17,7 +17,12 @@
                     <a class="button is-link" href="{{url_for('auth.login', account_type='CUSTOMER')}}">Customer</a>
                 </div>
             {% elif navbar_type == 'user' %}
-                <div class="navbar-item">
+                {% if user_type == 'customer' %} 
+                    <div class="navbar-item">
+                        <a class="button is-link" href="{{url_for('customer.tickets')}}">Tickets</a>
+                    </div>
+                {% endif %}
+                <div class="navbar-item"> 
                     <a class="button is-link" href="{{url_for('auth.logout')}}">Logout</a>
                 </div>
             {% elif navbar_type == 'business_items' %}

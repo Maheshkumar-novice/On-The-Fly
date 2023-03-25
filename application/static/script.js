@@ -217,7 +217,13 @@ document.addEventListener("DOMContentLoaded", () => {
                       }
                     );
     await response.json().then(() => {
-        window.location.href = '/';
+        window.location.href = '/customer/tickets';
     });
+  });
+
+  (document.querySelectorAll(".ticket") || []).forEach(($ticket) => {
+    $ticket.addEventListener("click", (e) => {
+      window.location.href = `/customer/tickets/${$ticket.dataset.id}`;
+    })
   });
 });

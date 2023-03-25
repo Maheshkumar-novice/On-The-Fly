@@ -1,3 +1,5 @@
+from application.business.models import Ticket, TicketItem
+from flask_login import current_user
 from flask import redirect, render_template, request, url_for
 from flask_login import login_required
 from sqlalchemy import select
@@ -42,3 +44,24 @@ def feed():
     form.process()
 
     return render_template('customer_feed.html', navbar_type='user', user_type='customer', businesses=businesses, form=form)
+
+
+@login_required
+def tickets():
+    tickets = [ticket.to_dict() for ticket in Ticket.query.filter(
+        Ticket.created_by == current_user.id).all()]
+
+    return render_template('customer_tickets.html', navbar_type='user', user_type='customer', tickets=tickets)
+
+
+@login_required
+def ticket(id):
+    ticket = Ticket.query.filter(Ticket.id == id)
+
+    if ticket:
+        ticket = ticket.scalar().to_dict()
+        ticket_items = [ticket_item.to_dict() for ticket_item in TicketItem.query.filter(
+            TicketItem.ticket_id == id).all()]
+        return render_template('customer_ticket.html', navbar_type='user', user_type='customer', ticket=ticket, ticket_items=ticket_items)
+
+    return redirect(url_for('customer.tickets'))
