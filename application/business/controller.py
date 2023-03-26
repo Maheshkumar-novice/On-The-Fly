@@ -8,10 +8,10 @@ from application.business.constants import NEW
 from application.business.forms import (BusinessHomePageEditForm,
                                         BusinessItemEditForm, BusinessItemForm,
                                         BusinessItemSearchForm,
-                                        BusinessTicketForm)
+                                        BusinessTicketForm, BusinessTicketCommentForm)
 from application.business.models import (BusinessInformation, BusinessItem,
                                          BusinessSubType, BusinessType, Ticket,
-                                         TicketItem)
+                                         TicketItem, TicketComment)
 
 
 @login_required
@@ -273,12 +273,29 @@ def tickets():
 
 @login_required
 def ticket_by_id(id):
+    form = BusinessTicketCommentForm()
     ticket = Ticket.query.filter(Ticket.id == id)
 
     if ticket:
         ticket = ticket.scalar().to_dict()
         ticket_items = [ticket_item.to_dict() for ticket_item in TicketItem.query.filter(
             TicketItem.ticket_id == id).all()]
-        return render_template('business_ticket_view.html', navbar_type='user', user_type='business', ticket=ticket, ticket_items=ticket_items)
+        ticket_comments = [ticket_comment.to_dict(
+        ) for ticket_comment in TicketComment.query.filter(TicketComment.ticket_id == id).all()]
+        return render_template('business_ticket_view.html', navbar_type='user', user_type='business', ticket=ticket, ticket_items=ticket_items, ticket_comments=ticket_comments, form=form)
 
     return redirect(url_for('business.tickets'))
+
+
+@login_required
+def add_ticket_comment(id):
+    comment = request.get_json().get('comment')
+
+    if comment:
+        ticket_comment = TicketComment(
+            posted_by=current_user.id, comment=comment, ticket_id=id)
+        db.session.add(ticket_comment)
+        db.session.commit()
+        return {}, 200
+
+    return {}, 403

@@ -6,8 +6,9 @@ from sqlalchemy import select
 
 from application import db
 from application.auth.models import User
-from application.business.models import BusinessInformation
+from application.business.models import BusinessInformation, TicketComment
 from application.customer.forms import BusinessSearchForm
+from application.business.forms import BusinessTicketCommentForm
 
 
 @login_required
@@ -56,12 +57,15 @@ def tickets():
 
 @login_required
 def ticket(id):
+    form = BusinessTicketCommentForm()
     ticket = Ticket.query.filter(Ticket.id == id)
 
     if ticket:
         ticket = ticket.scalar().to_dict()
         ticket_items = [ticket_item.to_dict() for ticket_item in TicketItem.query.filter(
             TicketItem.ticket_id == id).all()]
-        return render_template('customer_ticket.html', navbar_type='user', user_type='customer', ticket=ticket, ticket_items=ticket_items)
+        ticket_comments = [ticket_comment.to_dict(
+        ) for ticket_comment in TicketComment.query.filter(TicketComment.ticket_id == id).all()]
+        return render_template('customer_ticket.html', navbar_type='user', user_type='customer', ticket=ticket, ticket_items=ticket_items, ticket_comments=ticket_comments, form=form)
 
     return redirect(url_for('customer.tickets'))

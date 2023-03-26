@@ -203,7 +203,6 @@ document.addEventListener("DOMContentLoaded", () => {
       let requirement = $ticketItem.querySelector('.ticket-item-requirement').textContent;
       ticketItems.push({name: name, requirement: requirement})
     }
-    console.log(JSON.stringify(ticketItems));
 
     $form = document.querySelector('form');
     response = await fetch(`/business/ticket?id=${$form.dataset.businessId}`, 
@@ -231,5 +230,33 @@ document.addEventListener("DOMContentLoaded", () => {
     $ticket.addEventListener("click", (e) => {
       window.location.href = `/business/tickets/${$ticket.dataset.id}`;
     })
+  });
+
+  document.querySelector(".ticket-comment-form")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.target);
+    const formProps = Object.fromEntries(formData);
+    const comment = formProps.comment.trim();
+
+    if (!comment) {
+      alert('Please enter a comment...')
+    }
+
+    await fetch(`/business/tickets/${e.target.dataset.ticketId}/comment`,
+    { 
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({'comment': comment})
+    })
+      .then((data) => data.json())
+      .then((data) => console.log(data));
+
+    e.target.reset();
+
+    window.location.reload();
   });
 });

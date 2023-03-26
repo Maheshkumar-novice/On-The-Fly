@@ -66,3 +66,7 @@ class BusinessTicketForm(FlaskForm):
     business_items = SelectField('Business Items', choices=[])
     requirement = StringField('Requirement (kg/days/nos)', validators=[
         Length(min=1, max=50)], description='Requirement (kg/days/nos)')
+
+
+class BusinessTicketCommentForm(FlaskForm):
+    comment = StringField('Comment', validators=[Length(min=1, max=250)], description='Add Comment')

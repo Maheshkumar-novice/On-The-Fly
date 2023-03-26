@@ -106,7 +106,8 @@ class Ticket(db.Model, SerializerMixin):
     ticket_items = relationship('TicketItem', cascade='all, delete')
     ticket_comments = relationship('TicketComment', cascade='all, delete')
 
-    serialize_only = ('id', 'status', 'business.name', 'customer.name', 'created_at', 'updated_at')
+    serialize_only = ('id', 'status', 'business.name',
+                      'customer.name', 'created_at', 'updated_at')
 
 
 class TicketItem(db.Model, SerializerMixin):
@@ -124,7 +125,7 @@ class TicketItem(db.Model, SerializerMixin):
     serialize_only = ('item_name', 'item_requirement')
 
 
-class TicketComment(db.Model):
+class TicketComment(db.Model, SerializerMixin):
     __tablename__ = 'ticket_comments'
 
     id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
@@ -136,3 +137,5 @@ class TicketComment(db.Model):
                         default=datetime.now, onupdate=datetime.now)
     ticket = relationship('Ticket', back_populates='ticket_comments')
     user = relationship('User', back_populates='ticket_comments')
+
+    serialize_only = ('comment', 'user.name')

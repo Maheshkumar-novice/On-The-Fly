@@ -80,3 +80,8 @@ business_buleprint.add_url_rule(rule='/tickets/<int:id>',
                                 view_func=ticket_by_id,
                                 endpoint='ticket_by_id',
                                 methods=['GET'])
+
+business_buleprint.add_url_rule(rule='/tickets/<int:id>/comment',
+                                view_func=add_ticket_comment,
+                                endpoint='add_ticket_comment',
+                                methods=['POST'])

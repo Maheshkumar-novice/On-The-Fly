@@ -1,3 +1,6 @@
+{% set action_url = '#' %}
+{% set button_value = 'Comment' %}
+
 {% extends "base.html" %} 
 {% import "macros.html" as macros %}
 
@@ -19,16 +22,6 @@
                 </div>
                 <hr>
                 <div class="content">
-                    <h2 class="is-size-5">Created At</h2>
-                    <p>{{ticket.created_at}}</p>
-                </div>
-                <hr>
-                <div class="content">
-                    <h2 class="is-size-5">Updated At</h2>
-                    <p>{{ticket.updated_at}}</p>
-                </div>
-                <hr>
-                <div class="content">
                     <h2 class="is-size-5">Ticket Items</h2>
                     {% for ticket_item in ticket_items %} 
                         <p>{{ticket_item.item_name}} - {{ticket_item.item_requirement}}</p>
@@ -37,8 +30,34 @@
                 <hr>
                 <div class="content">
                     <h2 class="is-size-5">Ticket Comments</h2>
+                    <form action={{action_url}} method="POST" class="box ticket-comment-form" data-ticket-id="{{ticket.id}}">
+                        <fieldset>
+                            {{macros.form_fields(form)}}                    
+        
+                            <div class="field">
+                                <div class="control">
+                                    <button type="submit" class="button is-link">{{button_value}}</button>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </form>
+
+                    {% for ticket_comment in ticket_comments %} 
+                        <p class="box">{{ticket_comment.comment}}</p>
+                        <sub class="is-pulled-right">{{ticket_comment.user.name}}</sub>
+                        <br>
+                    {% endfor %}
                 </div>
                 <hr>
+                <div class="content">
+                    <h2 class="is-size-5">Created At</h2>
+                    <p>{{ticket.created_at}}</p>
+                </div>
+                <hr>
+                <div class="content">
+                    <h2 class="is-size-5">Updated At</h2>
+                    <p>{{ticket.updated_at}}</p>
+                </div>
         </div>
     </div>
 </div>
