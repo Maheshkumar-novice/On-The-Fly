@@ -85,3 +85,8 @@ business_buleprint.add_url_rule(rule='/tickets/<int:id>/comment',
                                 view_func=add_ticket_comment,
                                 endpoint='add_ticket_comment',
                                 methods=['POST'])
+
+business_buleprint.add_url_rule(rule='/tickets/<int:id>/status',
+                                view_func=update_ticket_status,
+                                endpoint='update_ticket_status',
+                                methods=['PUT'])

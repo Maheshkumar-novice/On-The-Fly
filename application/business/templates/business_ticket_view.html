@@ -18,7 +18,16 @@
             <div class="card-content">
                 <div class="content">
                     <h2 class="is-size-5">Status</h2>
-                    <p>{{ticket.status}}</p>
+                    <div class="control">
+                        <div class="select">
+                            <select name="status" id="ticket-status-select" data-current-status="{{ticket.status}}" data-ticket-id="{{ticket.id}}">
+                                <option value="{{ticket.status}}" selected>{{ticket.status}}</option>
+                                {% for state in next_states %} 
+                                    <option value="{{state}}">{{state}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
                 </div>
                 <hr>
                 <div class="content">

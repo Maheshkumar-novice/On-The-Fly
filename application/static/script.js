@@ -259,4 +259,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
     window.location.reload();
   });
+
+  document.querySelector('select#ticket-status-select')?.addEventListener('change', async (e) => {
+    const $select = e.target;
+    const currentStatus = $select.dataset.currentStatus;
+    const newStatus = $select.value;
+
+    await fetch(`/business/tickets/${e.target.dataset.ticketId}/status`,
+    { 
+      method: 'PUT',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({'current_status': currentStatus, 'new_status': newStatus})
+    })
+      .then((data) => data.json())
+      .then((data) => console.log(data));
+
+    window.location.reload();
+  });
 });

@@ -1,3 +1,4 @@
+from application.business.constants import NEXT_STATES
 from flask import redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 from sqlalchemy import select
@@ -278,11 +279,12 @@ def ticket_by_id(id):
 
     if ticket:
         ticket = ticket.scalar().to_dict()
+        next_states = NEXT_STATES[ticket['status']]
         ticket_items = [ticket_item.to_dict() for ticket_item in TicketItem.query.filter(
             TicketItem.ticket_id == id).all()]
         ticket_comments = [ticket_comment.to_dict(
         ) for ticket_comment in TicketComment.query.filter(TicketComment.ticket_id == id).all()]
-        return render_template('business_ticket_view.html', navbar_type='user', user_type='business', ticket=ticket, ticket_items=ticket_items, ticket_comments=ticket_comments, form=form)
+        return render_template('business_ticket_view.html', navbar_type='user', user_type='business', ticket=ticket, ticket_items=ticket_items, ticket_comments=ticket_comments, next_states=next_states, form=form)
 
     return redirect(url_for('business.tickets'))
 
@@ -295,6 +297,22 @@ def add_ticket_comment(id):
         ticket_comment = TicketComment(
             posted_by=current_user.id, comment=comment, ticket_id=id)
         db.session.add(ticket_comment)
+        db.session.commit()
+        return {}, 200
+
+    return {}, 403
+
+
+@login_required
+def update_ticket_status(id):
+    data = request.get_json()
+    current_status = data.get('current_status')
+    new_status = data.get('new_status')
+
+    if current_status and new_status and new_status in NEXT_STATES[current_status]:
+        ticket = Ticket.query.filter(Ticket.id == id).scalar()
+        ticket.status = new_status
+        db.session.add(ticket)
         db.session.commit()
         return {}, 200
 
