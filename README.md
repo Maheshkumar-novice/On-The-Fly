@@ -8,7 +8,7 @@
       <a href="#description">Description</a>
     </li>
     <li>
-      <a href="#demo">Demo</a>
+      <a href="#example">Example</a>
     </li>
     <li>
       <a href="#built-with">Built With</a>
@@ -27,7 +27,7 @@ On The Fly is a software platform that created to help businesses and customers 
 it's related drawbacks. On The Fly gives the platform for customers to connect with businesses and for businesses to communicate with
 their customers.
 
-## Demo
+## Example
 <details>
 
   ![0](./examples/0.png)
